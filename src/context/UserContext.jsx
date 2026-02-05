@@ -13,8 +13,8 @@ export const UserProvider = ({ children }) => {
             try {
                 const response = await axiosInstance.get(API_ROUTES.GET_AUTH_USER);
                 const payload = response?.data;
-                const user = payload?.user ?? payload;
-
+                const user = payload?.data?.user ?? payload?.user ?? null;
+                
                 setUserData(user && !Array.isArray(user) ? user : null);
             } catch (error) {
                 setUserData(null);

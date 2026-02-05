@@ -6,7 +6,7 @@ export const API_ROUTES = {
     LOCAL_SERVER_URL: SERVER_URL,
 
     //user auth
-    USER_LOGIN: "/user/auth/login",
+    ADMIN_LOGIN: "/user/auth/admin/login",
     GET_AUTH_USER: "/user/auth/me",
     GET_ALL_USER: "/user",
     UPDATE_USER: "/user",
