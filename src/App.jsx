@@ -1,35 +1,60 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useEffect, useMemo } from 'react'
+import { ToastContainer } from 'react-toastify'
+import { routes as baseRoutes } from './config/Routes'
+import { createBrowserRouter, RouterProvider, Navigate, Outlet } from 'react-router-dom'
+import { UserProvider, useUser } from './context/UserContext'
+//import { getItemFromLocalStorage } from './helpers/helper'
 
-function App() {
-  const [count, setCount] = useState(0)
+const AdminProtectedRoute = ({ children }) => {
+  const { userData, loading } = useUser();
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+  if(loading) return null;
+
+  if(!userData) return <Navigate to="/login" replace />
+
+  return children;
 }
+
+const AppContent = () => {
+  const { userData, loading = false } = useUser();
+
+  const router = useMemo(() => {
+    const updatedRoutes = baseRoutes.map((route) => ({ ...route}));
+
+    const mainIndex = updatedRoutes.findIndex((route) => route.path === "/");
+    if(mainIndex !== -1) {
+      const mainRoute = updatedRoutes[mainIndex];
+
+      updatedRoutes[mainIndex] = {
+        ...mainRoute,
+        element: (
+          <AdminProtectedRoute>
+            {mainRoute.element}
+          </AdminProtectedRoute>
+        ),
+      };
+    }
+
+    //handle unknown routes
+
+    updatedRoutes.push({
+      path: "*",
+      element: loading ? null : userData ? <Navigate to= "/dashboard" replace /> : <Navigate to="/login" replace/>
+    });
+
+    return createBrowserRouter(updatedRoutes);
+  }, [userData, loading]);
+
+  return <RouterProvider router={router}/>
+}
+
+const App = () => {
+  return (
+    <UserProvider>
+      <ToastContainer/>
+      <AppContent/>
+    </UserProvider>
+  );
+};
 
 export default App
