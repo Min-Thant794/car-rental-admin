@@ -5,6 +5,7 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../config/axiosInstance';
 import { API_ROUTES } from '../config/config';
+import { toast } from 'react-toastify';
 
 const Login = () => {
   
@@ -12,17 +13,22 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isShowPassword, setIsShowPassword] = useState(false);
+    const [errorUserNameMsg, setErrorUserNameMsg] = useState('');
+    const [errorPasswordMsg, setErrorPasswordMsg] = useState('');
 
     const navigate = useNavigate();
+    const { changeUserData } = useUser();
 
     const handleSubmit = async () => {
+        if(isLoading) return;
+        setIsLoading(true);
         try {
             if(userName.trim() === "") {
-                return alert("Please Enter Username!");
+                return setErrorUserNameMsg("Please Enter Username");
             }
 
             if(password.trim() === "") {
-                return alert("Please Enter Password!");
+                return setErrorPasswordMsg("Please Enter Password");
             }
 
             const response = await axiosInstance.post(API_ROUTES.ADMIN_LOGIN,
@@ -34,11 +40,25 @@ const Login = () => {
             console.log("response: ", response.data.message);
 
             if(response.data.success) {
+                try {
+                    const userResponse = await axiosInstance.get(API_ROUTES.GET_AUTH_USER);
+                    const payload = userResponse?.data;
+                    const user = payload?.data?.user ?? payload?.user ?? null;
+
+                    changeUserData(user && !Array.isArray(user) ? user : null);
+                } catch (error) {
+                    
+                }
                 navigate("/dashboard");
+                toast.success(response.data.message);
             }
             
         } catch (error) {
-            console.log("An Error Occurred!", error);
+            const message = error?.response?.data?.message || "Wrong Credentials";
+            toast.error(message);
+            console.error("An Error Occurred!", error);
+        } finally {
+            setIsLoading(false);
         }
     }
 
@@ -63,36 +83,48 @@ const Login = () => {
                     Welcome Back!
                 </div>
                 <div className='text-lg font-bold pb-5 text-amber-50'>
-                    Sign Up To Get Started
+                    Sign in to continue
                 </div>
                 <div className='flex flex-col w-full pb-5'>
                     <label htmlFor="username" className='w-full font-semibold text-amber-50'>Username</label>
-                    <input type="text" id='username' value={userName} 
+                    <input required type="text" id='username' value={userName} 
+                    autoComplete='username'
                     placeholder='Enter Your Username' 
                     onChange={(e) => setUserName(e.target.value)}
-                    className='rounded-md text-amber-50 placeholder:font-semibold'/>
+                    className='rounded-md text-amber-50 placeholder:font-semibold  border-none outline-none'/>
+
+                    {errorUserNameMsg && <p className="text-red-300 text-sm">{errorUserNameMsg}</p>}
                 </div>
                 <div className='flex flex-col w-full'>
                     <label htmlFor="password" className='w-full font-semibold text-amber-50'>Password</label>
                     <div className='flex  items-center w-full'>
                         <input type={isShowPassword ? 'text' : 'password'} 
+                        autoComplete='current-password'
+                        required
                         id='password'
                         value={password}
                         placeholder='Enter Your Password' 
                         onChange={(e) => setPassword(e.target.value)}
                         className='w-9/10 border-none outline-none text-amber-50 placeholder:font-semibold' />
-                        <div className='flex items-center justify-center w-1/10 cursor-pointer active:opacity-60'>
+                        <div
+                        type="button"
+                        onClick={() => setIsShowPassword(!isShowPassword)}
+                        className='flex items-center justify-center w-1/10 cursor-pointer active:opacity-60'>
                             {
                                 isShowPassword ?
-                                <FaEye onClick={() => setIsShowPassword(!isShowPassword)} className='text-amber-50'/>
+                                <FaEye className='text-amber-50'/>
                                 :
-                                <FaEyeSlash  onClick={() => setIsShowPassword(!isShowPassword)} className='text-amber-50'/>
+                                <FaEyeSlash className='text-amber-50'/>
                             }
                         </div>
                     </div>
+                    {errorPasswordMsg && <p className="text-red-300 text-sm">{errorPasswordMsg}</p>}
                 </div>
-                <button className='w-full bg-[#222222] text-center py-2 cursor-pointer rounded-md font-bold text-amber-50 tracking-wider mt-5'>
-                    Login
+                <button 
+                type='submit'
+                disabled={isLoading}
+                className='w-full bg-[#222222] text-center py-2 cursor-pointer rounded-md font-bold active:opacity-65 text-amber-50 tracking-wider mt-5'>
+                    {isLoading ? 'Logging in...' : 'Login'}
                 </button>
             </form>
         </div>
