@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, matchPath, useNavigate } from 'react-router-dom';
-import {getCurrentAdmin, updateUserData} from "../services/user.service"
+import {updateUserData} from "../services/user.service"
 import { FaBell, FaEdit, FaUser } from 'react-icons/fa';
 import { useUser } from '../context/UserContext';
 import { IoIosSettings } from "react-icons/io";
@@ -11,7 +11,7 @@ import { toast } from 'react-toastify';
 
 const TopNavBar = () => {
 
-  const { userData: isUser, logout, isLoading } = useUser();
+  const { userData: isUser, logout, changeUserData} = useUser();
 
   const [isNotification, setIsNotification] = useState(false);
   const [userDetail, setUserDetail] = useState(false);
@@ -22,10 +22,10 @@ const TopNavBar = () => {
   const [email, setEmail] = useState(isUser?.email || "Not Provided");
   const [password, setPassword] = useState("");
   const [file, setFile] = useState(null);
-  const [userData, setUserData] = useState(getCurrentAdmin);
 
   const uploadImage = (file) => {
     if(!file) return 
+    setFile(file);
     const url = URL.createObjectURL(file);
     setPreviewImg(url);
   }
@@ -74,32 +74,59 @@ const TopNavBar = () => {
 
   const handleCancelEdit = () => {
     setIsEdit(false);
-    setPreviewImg(null);
+    setPreviewImg(isUser?.profileImageUrl || null);
     setUserName(isUser?.userName || '');
-    setEmail(isUser?.email || '');
+    setEmail(isUser?.email || 'Not Provided');
     setPassword('');
   }
 
   const handleUserUpdate = async () => {
     try {
-        if(!previewImg && userName === isUser?.userName && email.trim() === "") {
+
+        const hasProfileChange = Boolean(file);
+        const hasUserNameChange = userName.trim() !== (isUser?.userName || "");
+        const hasEmailChange = email.trim() !== (isUser?.email || "");
+        const hasPasswordChange = password.trim().length > 0;
+
+        if(!hasProfileChange && !hasUserNameChange && !hasEmailChange && !hasPasswordChange) {
             return toast.info("Validation Failed!");
+        }
+
+        if(!isUser?._id) {
+            return toast.error("Unable to update profile. User ID not found.");
         }
 
         const formData = new FormData();
         formData.append("userName", userName);
         formData.append("email", email);
-        formData.append("password", password);
-        formData.append('profileImageUrl', previewImg);
 
-        const response = await updateUserData(userData._id, formData);
+        if(hasPasswordChange) {
+            formData.append("password", password.trim());
+        }
+
+        if(file) {
+            formData.append("profileImageUrl", file);
+        }
+
+        const response = await updateUserData(isUser._id, formData);
         console.log("handleUserUpdate() response: ", response);
 
         if(response.success) {
-            toast.success(response?.data?.message);
+            const updatedUser = response?.data?.user || response?.user;
+
+            if(updatedUser) {
+                changeUserData(updatedUser);
+            }
+
+            toast.success(response?.message || "Profile updated successfully");
+            setIsEdit(false);
+            setPassword("");
+            setFile(null);
+            return;
         }
     } catch (error) {
         console.error("An Error Occurred at handleUserUpdate()", error);
+        toast.error("An unexpected error occurred while updating profile!");
     }
   }
 
@@ -162,6 +189,9 @@ const TopNavBar = () => {
                 onClick={(e) => {
                     e.stopPropagation();
                     setUserDetail(false);
+                    setPreviewImg(isUser?.profileImageUrl || null);
+                    setUserName(isUser?.userName || "");
+                    setPassword("");
                     setExpandUserDetail(true);
                 }}
                 className='flex items-center gap-2 font-semibold tracking-wide pt-1 pb-2 border-b-2 border-b-amber-50 hover:opacity-75 active:opacity-65'>
@@ -217,7 +247,7 @@ const TopNavBar = () => {
                                 Profile Details
                             </div>
                             <div 
-                            onClick={(e) => {
+                            onClick={() => {
                                 setExpandUserDetail(false)
                                 handleCancelEdit();
                             }}
@@ -340,8 +370,7 @@ const TopNavBar = () => {
                                             }}
                                             className='px-3 py-2 text-center cursor-pointer w-3/10 mt-5 bg-[#ff0000] font-bold tracking-wide rounded-md'>Cancel</div>
                                             <button 
-                                            onClick={(e) => {
-                                                e.stopPropagation();
+                                            onClick={() => {
                                                 setIsEdit(false);
                                             }}
                                             className='px-3 py-2 text-center cursor-pointer w-3/10 mt-5 bg-[#a4a4a4] font-bold tracking-wide rounded-md'>Submit
