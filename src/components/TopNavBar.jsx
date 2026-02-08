@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, matchPath, useNavigate } from 'react-router-dom';
-import {getAllUser, getCurrentAdmin, updateUserData} from "../services/user.service"
+import {getCurrentAdmin, updateUserData} from "../services/user.service"
 import { FaBell, FaEdit, FaUser } from 'react-icons/fa';
 import { useUser } from '../context/UserContext';
 import { IoIosSettings } from "react-icons/io";
@@ -22,6 +22,7 @@ const TopNavBar = () => {
   const [email, setEmail] = useState(isUser?.email || "Not Provided");
   const [password, setPassword] = useState("");
   const [file, setFile] = useState(null);
+  const [userData, setUserData] = useState(getCurrentAdmin);
 
   const uploadImage = (file) => {
     if(!file) return 
@@ -62,19 +63,26 @@ const TopNavBar = () => {
         setUserDetail(false);
         setExpandUserDetail(false);
         setIsNotification(false);
-        setIsEdit(false);
-        setPreviewImg(false);
     };
 
-    if(userDetail || expandUserDetail || isNotification || isEdit || previewImg) {
+    if(userDetail || expandUserDetail || isNotification) {
         document.addEventListener('click', handleClickOutside);
         return () => document.removeEventListener('click', handleClickOutside);
     }
-  }, [userDetail, expandUserDetail, isNotification, isEdit || previewImg]);
+  }, [userDetail, expandUserDetail, isNotification]);
+
+
+  const handleCancelEdit = () => {
+    setIsEdit(false);
+    setPreviewImg(null);
+    setUserName(isUser?.userName || '');
+    setEmail(isUser?.email || '');
+    setPassword('');
+  }
 
   const handleUserUpdate = async () => {
     try {
-        if(!previewImg && name === isUser?.userName && email.trim() === "") {
+        if(!previewImg && userName === isUser?.userName && email.trim() === "") {
             return toast.info("Validation Failed!");
         }
 
@@ -82,9 +90,14 @@ const TopNavBar = () => {
         formData.append("userName", userName);
         formData.append("email", email);
         formData.append("password", password);
-        formData.append('profileImageUrl', file);
+        formData.append('profileImageUrl', previewImg);
 
-        const reponse = await update
+        const response = await updateUserData(userData._id, formData);
+        console.log("handleUserUpdate() response: ", response);
+
+        if(response.success) {
+            toast.success(response?.data?.message);
+        }
     } catch (error) {
         console.error("An Error Occurred at handleUserUpdate()", error);
     }
@@ -189,7 +202,10 @@ const TopNavBar = () => {
             {
                 expandUserDetail &&
                 <div 
-                onClick={() => setExpandUserDetail(false)}
+                onClick={() => {
+                    setExpandUserDetail(false)
+                    handleCancelEdit();
+                }}
                 className='fixed inset-0 flex items-center justify-center bg-black/20 z-50'>
                     <div 
                     onClick={(e) => {
@@ -201,14 +217,19 @@ const TopNavBar = () => {
                                 Profile Details
                             </div>
                             <div 
-                            onClick={(e) => setExpandUserDetail(false)}
+                            onClick={(e) => {
+                                setExpandUserDetail(false)
+                                handleCancelEdit();
+                            }}
                             className='text-2xl font-bold cursor-pointer active:opacity-65'>
-                                <IoClose/>
+                                <IoClose
+                                />
                             </div>
                         </div>
                         <form
                         onSubmit={(e) => {
                             e.preventDefault();
+                            handleUserUpdate();
                         }}
                         className='grid grid-cols-7 pt-5 text-amber-50'>
                             <div className='relative grid col-span-3'>
@@ -242,9 +263,9 @@ const TopNavBar = () => {
                                     <input 
                                     type="text" 
                                     id='userName' 
-                                    value={userName} 
+                                    value={userName}
                                     readOnly={!isEdit}
-                                    onChange={(e) => e.target.value}
+                                    onChange={(e) => setUserName(e.target.value)}
                                     className='col-span-4 font-semibold tracking-wide outline-none border-none' />
                                 </div>
                                 <div className='grid grid-cols-7 pt-1'>
@@ -256,9 +277,9 @@ const TopNavBar = () => {
                                     <input 
                                     type="text" 
                                     id='email' 
-                                    value={email} 
+                                    value={email}
                                     readOnly={!isEdit}
-                                    onChange={(e) => e.target.value}
+                                    onChange={(e) => setEmail(e.target.value)}
                                     className='col-span-4 font-semibold tracking-wide outline-none border-none' />
                                 </div>
                                 <div className='grid grid-cols-7 pt-1'>
@@ -272,7 +293,7 @@ const TopNavBar = () => {
                                     id='password' 
                                     value={password}
                                     readOnly={!isEdit}
-                                    onChange={(e) => e.target.value}
+                                    onChange={(e) => setPassword(e.target.value)}
                                     placeholder='•••••••••'
                                     className='col-span-4 font-semibold tracking-wide outline-none border-none' />
                                 </div>
@@ -315,15 +336,16 @@ const TopNavBar = () => {
                                             <div 
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                setIsEdit(false)
+                                                handleCancelEdit();
                                             }}
                                             className='px-3 py-2 text-center cursor-pointer w-3/10 mt-5 bg-[#ff0000] font-bold tracking-wide rounded-md'>Cancel</div>
-                                            <div 
+                                            <button 
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 setIsEdit(false);
                                             }}
-                                            className='px-3 py-2 text-center cursor-pointer w-3/10 mt-5 bg-[#a4a4a4] font-bold tracking-wide rounded-md'>Submit</div>
+                                            className='px-3 py-2 text-center cursor-pointer w-3/10 mt-5 bg-[#a4a4a4] font-bold tracking-wide rounded-md'>Submit
+                                            </button>
                                         </div>
                                     }
                                 </div>
