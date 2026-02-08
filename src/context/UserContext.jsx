@@ -11,7 +11,7 @@ export const UserProvider = ({ children }) => {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const response = await axiosInstance.get(API_ROUTES.GET_AUTH_USER);
+                const response = await axiosInstance.get(API_ROUTES.GET_CURRENT_ADMIN);
                 const payload = response?.data;
                 const user = payload?.data?.user ?? payload?.user ?? null;
                 

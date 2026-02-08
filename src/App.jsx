@@ -15,6 +15,16 @@ const AdminProtectedRoute = ({ children }) => {
   return children;
 }
 
+const PublicOnlyRoute = ({ children }) => {
+  const { userData, loading } = useUser();
+
+  if(loading) return null;
+
+  if(userData) return <Navigate to="/dashboard" replace/>
+
+  return children;
+}
+
 const AppContent = () => {
   const { userData, loading = false } = useUser();
 
@@ -32,6 +42,20 @@ const AppContent = () => {
             {mainRoute.element}
           </AdminProtectedRoute>
         ),
+      };
+    }
+
+    const loginIndex = updatedRoutes.findIndex((route) => route.path === "/login");
+    if(loginIndex !== -1) {
+      const loginRoute = updatedRoutes[loginIndex];
+
+      updatedRoutes[loginIndex] = {
+        ...loginRoute,
+        element: (
+          <PublicOnlyRoute>
+            {loginRoute.element}
+          </PublicOnlyRoute>
+        )
       };
     }
 
