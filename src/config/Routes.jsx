@@ -7,7 +7,6 @@ import Dashboard from "../pages/Dashboard"
 import Car from "../pages/Car"
 import Booking from "../pages/Booking"
 import ManageUsers from "../pages/ManageUsers"
-import Settings from "../pages/Settings"
 
 export const routes = [
     {
@@ -48,12 +47,6 @@ export const routes = [
                 element: <ManageUsers/>,
                 icon: <FaUser/>
             },
-            {
-                name: "Settings",
-                path: "/settings",
-                element: <Settings/>,
-                icon: <IoIosSettings/>
-            }
         ]
     }
 ]

@@ -14,9 +14,9 @@ export const API_ROUTES = {
 
     //cars
     GET_ALL_CARS: "/cars",
-    POST_NEW_CAR: "/cars",
-    UPDATE_CAR: "/cars/id",
-    DELETE_CAR: "/cars/id",
+    POST_NEW_CAR: "/cars/create-car",
+    UPDATE_CAR: "/cars",
+    DELETE_CAR: "/cars",
 
     //bookings
     GET_ALL_BOOKINGS: "/bookings",

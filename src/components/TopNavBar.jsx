@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, matchPath, useNavigate } from 'react-router-dom';
 import {updateUserData} from "../services/user.service"
-import { FaBell, FaEdit, FaUser } from 'react-icons/fa';
+import { FaBell, FaEdit, FaUser, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useUser } from '../context/UserContext';
-import { IoIosSettings } from "react-icons/io";
 import { RiLogoutBoxFill } from "react-icons/ri";
 import { ImProfile } from "react-icons/im";
 import { IoClose } from 'react-icons/io5';
@@ -22,6 +21,7 @@ const TopNavBar = () => {
   const [email, setEmail] = useState(isUser?.email || "Not Provided");
   const [password, setPassword] = useState("");
   const [file, setFile] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const uploadImage = (file) => {
     if(!file) return 
@@ -112,7 +112,7 @@ const TopNavBar = () => {
         console.log("handleUserUpdate() response: ", response);
 
         if(response.success) {
-            const updatedUser = response?.data?.user || response?.user;
+            const updatedUser = response?.data;
 
             if(updatedUser) {
                 changeUserData(updatedUser);
@@ -128,6 +128,8 @@ const TopNavBar = () => {
         console.error("An Error Occurred at handleUserUpdate()", error);
         toast.error("An unexpected error occurred while updating profile!");
     }
+
+    useEffect()
   }
 
   return (
@@ -141,6 +143,7 @@ const TopNavBar = () => {
             onClick={(e) => {
                 e.stopPropagation();
                 toggleNotification();
+                setUserDetail(false);
             }}
             className='relative'
             >
@@ -149,7 +152,7 @@ const TopNavBar = () => {
                 onClick={(e) => {
                     e.stopPropagation();
                 }}
-                className={`transition-all duration-300 absolute top-13 p-3 right-0.5 rounded-lg ${isNotification ? "opacity-100 translate-y-1" : "opacity-0 -translate-y-1 pointer-events-none"} bg-[#a4a4a4]`}>
+                className={`transition-all shadow-md duration-300 absolute top-13 p-3 right-0.5 rounded-lg ${isNotification ? "opacity-100 translate-y-1" : "opacity-0 -translate-y-1 pointer-events-none"} bg-[#a4a4a4]`}>
                     <div className='tracking-wide font-semibold'>
                         Notification
                     </div>
@@ -160,6 +163,7 @@ const TopNavBar = () => {
             onClick={(e) => {
                 e.stopPropagation();
                 toggleUserDetail();
+                setIsNotification(false);
             }}
             className='flex relative justify-center gap-2 items-center cursor-pointer active:opacity-60 hover:opacity-80'>
                 <div className='flex items-center justify-center p-3'>
@@ -184,7 +188,7 @@ const TopNavBar = () => {
             onClick={(e) => {
                 e.stopPropagation();
             }}
-            className={`transition-all duration-300 ${userDetail ? "opacity-100 translate-y-1" : "opacity-0 -translate-y-1 pointer-events-none"} flex flex-col px-3 py-3 bg-[#a4a4a4] absolute right-5 top-17 w-40 rounded-lg cursor-pointer`}>
+            className={`transition-all shadow-md duration-300 ${userDetail ? "opacity-100 translate-y-1" : "opacity-0 -translate-y-1 pointer-events-none"} flex flex-col px-3 py-3 bg-[#a4a4a4] absolute right-5 top-17 w-40 rounded-lg cursor-pointer`}>
                 <div 
                 onClick={(e) => {
                     e.stopPropagation();
@@ -199,19 +203,6 @@ const TopNavBar = () => {
                         <ImProfile />
                     </div>
                     <div>Profile Details</div>
-                </div>
-
-                <div 
-                onClick={(e) => {
-                    e.stopPropagation();
-                    setUserDetail(false);
-                    navigate("/settings");
-                }}
-                className='flex items-center gap-2 font-semibold tracking-wide py-2 border-b-2 border-b-amber-50 hover:opacity-75 active:opacity-65'>
-                    <div className='text-xl'>
-                        <IoIosSettings/>
-                    </div>
-                    <div>Settings</div>
                 </div>
 
                 <div 
@@ -236,7 +227,7 @@ const TopNavBar = () => {
                     setExpandUserDetail(false)
                     handleCancelEdit();
                 }}
-                className='fixed inset-0 flex items-center justify-center bg-black/20 z-50'>
+                className='fixed shadow-md inset-0 flex items-center justify-center bg-black/20 z-50'>
                     <div 
                     onClick={(e) => {
                         e.stopPropagation();
@@ -251,7 +242,7 @@ const TopNavBar = () => {
                                 setExpandUserDetail(false)
                                 handleCancelEdit();
                             }}
-                            className='text-2xl font-bold cursor-pointer active:opacity-65'>
+                            className='transition duration-300 text-2xl font-bold cursor-pointer active:opacity-65 hover:opacity-80'>
                                 <IoClose
                                 />
                             </div>
@@ -268,7 +259,7 @@ const TopNavBar = () => {
                                     isEdit &&
                                     <div 
                                     onClick={uploadNewImage}
-                                    className='absolute flex items-center active:opacity-65 cursor-pointer gap-2 px-2 py-1 rounded-md bottom-3 bg-[#a4a4a4] right-10'>
+                                    className='transition duration-300 absolute flex items-center active:opacity-65 hover:opacity-80 cursor-pointer gap-2 px-2 py-1 rounded-md bottom-3 bg-[#a4a4a4] right-10'>
                                         <FaEdit/>
                                         <div className='font-semibold'>
                                             upload
@@ -318,14 +309,31 @@ const TopNavBar = () => {
                                     className='col-span-3 font-bold tracking-wide'>
                                         Password:
                                     </label>
-                                    <input 
-                                    type="password" 
-                                    id='password' 
-                                    value={password}
-                                    readOnly={!isEdit}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    placeholder='•••••••••'
-                                    className='col-span-4 font-semibold tracking-wide outline-none border-none' />
+                                    <div className='flex justify-between items-center col-span-4'>
+                                        <input 
+                                        type={showPassword ? "text" : "password"}
+                                        id='password' 
+                                        value={password}
+                                        readOnly={!isEdit}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        placeholder='•••••••••'
+                                        className='font-semibold tracking-wide outline-none border-none w-8/10' />
+                                        {
+                                            isEdit &&
+                                            <div className='w-2/10'>
+                                                {
+                                                    showPassword ? 
+                                                    <FaEye 
+                                                    onClick={() => setShowPassword(!showPassword)}
+                                                    className='cursor-pointer active:opacity-65'/>
+                                                    :
+                                                    <FaEyeSlash 
+                                                    onClick={() => setShowPassword(!showPassword)}
+                                                    className='cursor-pointer active:opacity-65'/>
+                                                }
+                                            </div>
+                                        }
+                                    </div>
                                 </div>
                                 <div className='grid grid-cols-7 pt-1'>
                                     <div className='col-span-3 font-bold tracking-wide'>
@@ -357,7 +365,7 @@ const TopNavBar = () => {
                                         e.stopPropagation();
                                         setIsEdit(true);
                                     }}
-                                    className={`${isEdit && "opacity-0 pointer-events-none"} px-3 py-2 text-center cursor-pointer w-3/10 mt-5 bg-[#a4a4a4] font-bold tracking-wide rounded-md`}>
+                                    className={`${isEdit && "opacity-0 pointer-events-none"} transition duration-300 hover:opacity-65 active:opacity-80 px-3 py-2 text-center cursor-pointer w-3/10 mt-5 bg-[#a4a4a4] font-bold tracking-wide rounded-md`}>
                                         Edit
                                     </div>
                                     {
@@ -368,12 +376,16 @@ const TopNavBar = () => {
                                                 e.stopPropagation();
                                                 handleCancelEdit();
                                             }}
-                                            className='px-3 py-2 text-center cursor-pointer w-3/10 mt-5 bg-[#ff0000] font-bold tracking-wide rounded-md'>Cancel</div>
-                                            <button 
+                                            className='transition duration-300 active:opacity-65 hover:opacity-80 px-3 py-2 text-center cursor-pointer w-3/10 mt-5 bg-[#ff0000] font-bold tracking-wide rounded-md'>
+                                            Cancel
+                                            </div>
+                                            <button
                                             onClick={() => {
                                                 setIsEdit(false);
+                                                handleUserUpdate();
                                             }}
-                                            className='px-3 py-2 text-center cursor-pointer w-3/10 mt-5 bg-[#a4a4a4] font-bold tracking-wide rounded-md'>Submit
+                                            className='transition duration-300 active:opacity-65 hover:opacity-80 px-3 py-2 text-center cursor-pointer w-3/10 mt-5 bg-[#a4a4a4] font-bold tracking-wide rounded-md'>
+                                                Update
                                             </button>
                                         </div>
                                     }

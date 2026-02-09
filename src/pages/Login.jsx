@@ -41,7 +41,7 @@ const Login = () => {
 
             if(response.data.success) {
                 try {
-                    const userResponse = await axiosInstance.get(API_ROUTES.GET_AUTH_USER);
+                    const userResponse = await axiosInstance.get(API_ROUTES.GET_CURRENT_ADMIN);
                     const payload = userResponse?.data;
                     const user = payload?.data?.user ?? payload?.user ?? null;
 
@@ -123,7 +123,7 @@ const Login = () => {
                 <button 
                 type='submit'
                 disabled={isLoading}
-                className='w-full bg-[#222222] text-center py-2 cursor-pointer rounded-md font-bold active:opacity-65 text-amber-50 tracking-wider mt-5'>
+                className='transition duration-300 w-full bg-[#222222] text-center py-2 cursor-pointer rounded-md font-bold active:opacity-65 hover:opacity-80 text-amber-50 tracking-wider mt-5'>
                     {isLoading ? 'Logging in...' : 'Login'}
                 </button>
             </form>
