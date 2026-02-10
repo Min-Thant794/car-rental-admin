@@ -8,6 +8,8 @@ import { toast } from 'react-toastify';
 const Car = () => {
 
   const [addCar, setAddCar] = useState(false);
+  const [carListVersion, setCarListVersion] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
   
   const initialForm = useMemo(() => ({
     carName: "",
@@ -76,43 +78,48 @@ const Car = () => {
     resetForm();
   }
 
-  // const isFormEmpty = () => {
-  //   const allBlank = Object.values(form).every((v) => String(v).trim() === "");
-  //   return allBlank && !file;
-  // };
-
   const handleSubmit = async (e) => {
-    e.preventDefault();
     e.stopPropagation();
+    e.preventDefault();
+    setIsLoading(true);
 
-    if(!form.carName || !form.description || !form.carBrand || !form.availabilityStatus || !form.fuelType || !form.pricePerDay || !form.vehicleType) {
-      console.log("Missing required fields");
-      return;
+    try {
+      if(!form.carName || !form.description || !form.carBrand || !form.availabilityStatus || !form.fuelType || !form.pricePerDay || !form.vehicleType) {
+        toast.error("Please fill all required fields");
+        return;
+      }
+
+      const fd = new FormData();
+      fd.append("carName", form.carName);
+      fd.append("description", form.description);
+      fd.append("fuelType", form.fuelType);
+      fd.append("vehicleType", form.vehicleType);
+      fd.append("pricePerDay", form.pricePerDay);
+      fd.append("brand", form.carBrand);
+      fd.append("availabilityStatus", form.availabilityStatus);
+
+      if(file) {
+        fd.append("carImageUrl", file);
+      }
+
+      const response = await createCar(fd);
+
+      if(response?.success === false) {
+        toast.error(response.message || "Failed to add car");
+        return;
+      }
+
+      toast.success(response?.message || "A new car is successfully added!");
+      setCarListVersion((prev) => prev + 1);
+      resetForm();
+      setAddCar(false);
+    } catch (error) {
+      console.log("An Error Occurred at handleSubmit()", error);
+      toast.error("Unable to Add New Car");
+      return
+    } finally {
+      setIsLoading(false);
     }
-
-    const fd = new FormData();
-    fd.append("carName", form.carName);
-    fd.append("description", form.description);
-    fd.append("fuelType", form.fuelType);
-    fd.append("vehicleType", form.vehicleType);
-    fd.append("pricePerDay", form.pricePerDay);
-    fd.append("brand", form.carBrand);
-    fd.append("availabilityStatus", form.availabilityStatus);
-
-    if(file) {
-      fd.append("carImageUrl", file);
-    }
-
-    const response = await createCar(fd);
-
-    if(response?.success === false) {
-      console.log(response.message);
-      return;
-    }
-
-    toast.success(response?.message || "A new car is successfully added!");
-    resetForm();
-    setAddCar(false);
   }
 
   return (
@@ -122,14 +129,19 @@ const Car = () => {
         e.stopPropagation();
         toggleAddCar();
       }}
-      className='btn-border-reveal transition duration-300 px-3 py-2 bg-[#a4a4a4] w-1/13 font-bold select-none tracking-wide text-center rounded-lg shadow-md active:opacity-65 hover:opacity-85 cursor-pointer'>
+      className='btn-border-reveal bg-[#a4a4a4] transition duration-300 px-3 shadow-md py-2 w-1/13 font-bold select-none tracking-wide text-center rounded-lg active:opacity-65 hover:opacity-85 cursor-pointer'>
         Add Car
       </div>
 
       {
         addCar &&
         <div 
-        onClick={resetForm}
+        onClick={() => {
+          if(!isLoading) {
+            setAddCar(false);
+            resetForm();
+          }
+        }}
         className='fixed shadow-md inset-0 flex items-center justify-center bg-black/10 z-30'>
           <form 
           onSubmit={handleSubmit}
@@ -144,7 +156,7 @@ const Car = () => {
                 addCar &&
                 <div
                 onClick={uploadCarImage}
-                className='transition duration-300 absolute bottom-3 right-5 bg-[#434343] px-3 py-2 rounded-lg active:opacity-65 hover:opacity-80 cursor-pointer flex items-center gap-3'
+                className={`transition duration-300 absolute bottom-3 right-5 bg-[#434343] px-3 py-2 rounded-lg cursor-pointer flex items-center gap-3 ${isLoading ? 'opacity-50 pointer-events-none' : 'active:opacity-65 hover:opacity-80'}`}
                 >
                   <FaEdit className='text-amber-50'/>
                   <div className='font-semibold text-amber-50 tracking-wide'>
@@ -158,6 +170,7 @@ const Car = () => {
                 accept='image/*'
                 onChange={(e) => uploadImage(e.target.files[0])}
                 className='hidden'
+                disabled={isLoading}
                 />
             </div>
             <div className='col-span-4'>
@@ -174,7 +187,8 @@ const Car = () => {
                       placeholder={f.placeholder}
                       value={form[f.name]}
                       onChange={handleChange}
-                      className='py-1 outline-none border-none w-6/10 placeholder:font-semibold placeholder:text-sm rounded-lg px-2 bg-[#a4a4a4]'
+                      disabled={isLoading}
+                      className='py-1 outline-none border-none w-6/10 placeholder:font-semibold placeholder:text-sm rounded-lg px-2 bg-[#a4a4a4] disabled:opacity-50'
                       />
                     </div>
                   ))
@@ -184,13 +198,16 @@ const Car = () => {
                 <button 
                 type='button'
                 onClick={handleCancel}
-                className='transition duration-300 px-3 py-2 bg-[#ff0000] w-3/10 font-bold tracking-wide text-center cursor-pointer active:opacity-65 hover:opacity-80 text-amber-50 rounded-lg'>
+                disabled={isLoading}
+                className='transition duration-300 px-3 py-2 bg-[#ff0000] w-3/10 font-bold tracking-wide text-center cursor-pointer active:opacity-65 hover:opacity-80 text-amber-50 rounded-lg disabled:opacity-50'>
                   Cancel
                 </button>
                 <button
                 type='submit'
-                className='transition duration-300 px-3 py-2 bg-[#a4a4a4] w-3/10 font-bold tracking-wide text-center cursor-pointer active:opacity-65 hover:opacity-80 rounded-lg'>
-                  Add Car
+                disabled={isLoading}
+                className='transition duration-300 px-3 py-2 bg-[#a4a4a4] w-3/10 font-bold tracking-wide text-center cursor-pointer active:opacity-65 hover:opacity-80 rounded-lg disabled:opacity-50 flex items-center justify-center gap-2'>
+                  {isLoading && <div className="spinner"></div>}
+                  {isLoading ? 'Adding...' : 'Add Car'}
                 </button>
               </div>
             </div>
@@ -199,7 +216,7 @@ const Car = () => {
       }
 
       {/* display cars */}
-      <DisplayCars/>
+      <DisplayCars refreshTrigger={carListVersion}/>
     </div>
   )
 }

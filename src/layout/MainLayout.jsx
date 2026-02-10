@@ -10,7 +10,7 @@ const MainLayout = () => {
         <NavBar/>
       </div>
       <div className='flex flex-col w-full'>
-        <div className='z-50'>
+        <div className='top-0 sticky z-50'>
           <TopNavBar/>
         </div>
         <div className='p-3'>

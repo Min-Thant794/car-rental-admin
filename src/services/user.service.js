@@ -63,3 +63,19 @@ export const updateUserData = async (id, payload) => {
         }
     }
 }
+
+export const deleteUser = async(id) => {
+    try {
+        const response = await axiosInstance.delete(`${API_ROUTES.DELETE_USER}/${id}`);
+        console.log("deleteUser() response: ", response);
+        return response.data;
+    } catch (error) {
+        console.log("An Error Occurred at deleteUser()", error);
+
+        return {
+            success: false,
+            message: error.response?.data.message || "Internal Server Error!",
+            error
+        }
+    }
+}

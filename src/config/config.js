@@ -11,6 +11,7 @@ export const API_ROUTES = {
     GET_ALL_USER: "/user",
     UPDATE_USER: "/user",
     POST_NEW_USER: "/user",
+    DELETE_USER: "/user",
 
     //cars
     GET_ALL_CARS: "/cars",

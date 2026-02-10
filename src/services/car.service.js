@@ -33,7 +33,9 @@ export const getAllCar = async () => {
 
 export const updateCar = async(id, payload) => {
     try {
-        const response = await axiosInstance.put(`${API_ROUTES.UPDATE_CAR}/${id}`, payload);
+        const response = await axiosInstance.put(`${API_ROUTES.UPDATE_CAR}/${id}`, payload, {
+            headers: payload instanceof FormData ? {"Content-Type" : "multipart/form-data"} : {}
+        });
         console.log("updateCar() response: ", response);
         return response.data;
     } catch (error) {
