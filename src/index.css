@@ -19,12 +19,11 @@
 
 .btn-border-reveal:hover::after {
   width: 100%;
-  border-radius: 0.5rem;
 }
 
 .btn-border-reveal:hover {
-  color: white;
   border-radius: 0.5rem;
+  color: white;
 }
 
 @keyframes fadeIn {
