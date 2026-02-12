@@ -10,6 +10,8 @@ const DisplayUser = () => {
   const [isClick, setIsClick] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
 
+  const selectedUser = allUsers.find((user) => user._id === selectedUserId) || null;
+
   console.log("isClick: ", isClick);
 
   const fetchUsers = async () => {
@@ -19,7 +21,21 @@ const DisplayUser = () => {
 
       if(response.success) {
         const fetchedData = response?.data || [];
-        setAllUsers(fetchedData);
+        const normalizeUser = (u) => {
+        const c = u?.customer || u?.customerId || u?.customerProfile || null; // adjust if your backend uses a different key
+
+        return {
+          ...u,
+
+          phoneNumber: u?.phoneNumber ?? c?.phoneNumber ?? "",
+          dateOfBirth: u?.dateOfBirth ?? c?.dateOfBirth ?? "",
+          verificationStatus: u?.verificationStatus ?? c?.verificationStatus ?? "pending",
+          licenseImageUrl: u?.licenseImageUrl ?? c?.licenseImageUrl ?? "",
+        };
+      };
+
+      const normalized = fetchedData.map(normalizeUser);
+        setAllUsers(normalized);
         toast.success(response?.message);
       }
     } catch (error) {
@@ -31,7 +47,45 @@ const DisplayUser = () => {
   }
 
   const handleUpdateUser = async (id, payload) => {
-    
+    const previousUser = allUsers;
+
+    try {
+      setIsLoading(true);
+      const response = await updateUserData(id, payload);
+      
+      if(!response?.success || !response?.data) {
+        toast.error(response?.message || "Failed to update user.");
+        return null;
+      }
+
+      const updatedUser = response.data;
+      const c = updatedUser?.customerProfile;
+
+      setAllUsers((prevUsers) =>
+        prevUsers.map((user) => {
+          if (user._id !== id) return user;
+
+          return {
+            ...user,
+            ...updatedUser,
+
+            licenseImageUrl: c?.licenseImageUrl ?? updatedUser?.licenseImageUrl ?? user?.licenseImageUrl ?? "",
+            verificationStatus: c?.verificationStatus ?? updatedUser?.verificationStatus ?? user?.verificationStatus ?? "pending",
+
+            customerProfile: c ?? user?.customerProfile ?? null,
+          };
+        })
+      );
+
+      toast.success(response?.message || "User updated successfully!");
+      return updatedUser;
+    } catch (error) {
+      setAllUsers(previousUser);
+      toast.error("Unable to update user.");
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   const handleDeleteUser = async (id) => {
@@ -54,6 +108,7 @@ const DisplayUser = () => {
       toast.success(response?.message || "User is deleted successfully");
 
     } catch (error) {
+      console.log("An Error Occurred at handleDeleteUser()", error);
       setAllUsers(prev);
       toast.error("An Error Occurred! Failed to delete user");
       return;
@@ -103,15 +158,15 @@ const DisplayUser = () => {
         e.stopPropagation();
         setIsClick(true);
       }}
-      className='grid grid-cols-4 gap-3 pt-5 cursor-pointer'>
+      className='grid grid-cols-4 gap-3 pt-5'>
         {
           allUsers.map((u) => (
             <div 
             key={u._id}
-            onClick={(e) => {
+            onClick={() => {
               setSelectedUserId(u._id);
             }}
-            className='grid grid-cols-5 hover:bg-[#434343] transition hover:-translate-y-1 hover:rounded-full hover:text-amber-50 duration-500 shadow-lg justify-center items-center rounded-full px-1 bg-[#a4a4a4]'>
+            className='grid grid-cols-5 hover:bg-[#434343] cursor-pointer transition hover:-translate-y-1 hover:rounded-full hover:text-amber-50 duration-500 shadow-lg justify-center items-center rounded-full px-1 bg-[#a4a4a4]'>
               <div className='col-span-1'>
                 <img
                 src={u.profileImageUrl}
@@ -147,26 +202,28 @@ const DisplayUser = () => {
             </div>
           ))
         }
+        {
+          isClick &&
+          <div 
+          onClick={(e) => {
+            e.stopPropagation();
+            if(!isLoading) {
+              setIsClick(false);
+              setSelectedUserId(null);
+            }
+          }}
+          className={`fixed shadow-md ${isClick ? "opacity-100 translate-y-1" : "opacity-0 -translate-y-1 pointer-events-none"} inset-0 flex items-center justify-center bg-black/10 z-30`}>
+            <UserDetails 
+            setIsClick = {setIsClick}
+            userId={selectedUserId}
+            user={selectedUser}
+            fetchUser = {fetchUsers}
+            onDelete={handleDeleteUser}
+            onUpdate = {handleUpdateUser}
+            />
+          </div>
+        }
       </div>
-      {
-        isClick &&
-        <div 
-        onClick={(e) => {
-          e.stopPropagation();
-          if(!isLoading) {
-            setIsClick(false);
-            setSelectedUserId(null);
-          }
-        }}
-        className='fixed shadow-md inset-0 flex items-center justify-center bg-black/10 z-30'>
-          <UserDetails 
-          setIsClick = {setIsClick}
-          userId={selectedUserId}
-          onDelete={handleDeleteUser}
-          onUpdate = {handleUpdateUser}
-          />
-        </div>
-      }
     </div>
   )
 }

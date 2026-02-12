@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { getAllUser, updateUserData } from '../services/user.service'
 import { toast } from 'react-toastify';
 import UserInputField from './UserInputField'
 import { IoClose } from 'react-icons/io5';
@@ -7,7 +6,7 @@ import defaultImage from '../assets/default image.png';
 import DeleteConfirm from './DeleteConfirm';
 import UserDetailsLoadingSkeleton from './UserDetailsLoadingSkeleton'
 
-const UserDetails = ({userId, setIsClick, onDelete}) => {
+const UserDetails = ({userId, user, setIsClick, fetchUser, onDelete, onUpdate}) => {
 
   const [ userData, setUserData ] = useState([]);
   const [ isLoading, setIsLoading ] = useState(false);
@@ -36,7 +35,7 @@ const UserDetails = ({userId, setIsClick, onDelete}) => {
   ];
 
   const formatDateField = (fieldName, value) => {
-    if((fieldName === 'createdAt' || fieldName === 'updatedAt') && value) {
+    if((fieldName === 'createdAt' || fieldName === 'updatedAt' || fieldName === 'dateOfBirth') && value) {
       return value.slice(0, 10);
     }
 
@@ -50,39 +49,28 @@ const UserDetails = ({userId, setIsClick, onDelete}) => {
     }));
   }
 
-  const fetchUserById = async () => {
-    try {
-      setIsLoading(true);
-      const response = await getAllUser();
-
-      if(response.success) {
-        const fetchedUsers = response?.data || [];
-        const userData = fetchedUsers.find((u) => u._id === userId);
-
-        setUserData(userData);
-        setInitialUserData(userData);
-        setPreviewProfileImageById(userData?.profileImageUrl);
-        setPreviewLicenseImageById(userData?.licenseImageUrl);
-        setProfileImageFile(null);
-        setLicenseImageFile(null);
-        toast.success(response?.message);
-      }
-
-      console.log("response after fetch", response);
-    } catch (error) {
-      console.log("An Error Occurred at fetchAllUser()", error);
-      toast.error("Failed to fetch data");
-      return;
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
   useEffect(() => {
-    if(userId) {
-      fetchUserById();
+    if (user) {
+      const c = user?.customer || user?.customerId || user?.customerProfile || null;
+
+      const merged = {
+        ...user,
+        phoneNumber: user?.phoneNumber ?? c?.phoneNumber ?? "",
+        dateOfBirth: user?.dateOfBirth ?? c?.dateOfBirth ?? "",
+        verificationStatus: user?.verificationStatus ?? c?.verificationStatus ?? "pending",
+        licenseImageUrl: user?.licenseImageUrl ?? c?.licenseImageUrl ?? "",
+      };
+
+      setUserData(merged);
+      setInitialUserData(merged);
+
+      setPreviewProfileImageById(merged?.profileImageUrl || null);
+      setPreviewLicenseImageById(merged?.licenseImageUrl || null);
+
+      setProfileImageFile(null);
+      setLicenseImageFile(null);
     }
-  }, [userId]);
+  }, [user?._id]);
 
   const uploadProfileImg = (file) => {
     if(!file) return;
@@ -102,36 +90,11 @@ const UserDetails = ({userId, setIsClick, onDelete}) => {
   }
 
   const handleUpdateUser = async (id) => {
-    // Capture previews BEFORE any async calls to avoid stale closure issues
-    const currentProfilePreview = previewProfileImageById;
-    const currentLicensePreview = previewLicenseImageById;
-
     try {
       setIsLoading(true);
-
       if(!id) {
         toast.error("Unable to update user. User ID not found.");
         return;
-      }
-
-      const formData = new FormData();
-      formData.append("userName", userData?.userName || "");
-      formData.append("email", userData?.email || "");
-      formData.append("phoneNumber", userData?.phoneNumber || "");
-      formData.append("dateOfBirth", userData?.dateOfBirth || "");
-      formData.append("role", userData?.role);
-      formData.append("accountStatus", userData?.accountStatus);
-
-      if(userData?.password?.trim()) {
-        formData.append("password", userData.password.trim());
-      }
-
-      if(profileImageFile) {
-        formData.append("profileImageUrl", profileImageFile);
-      }
-
-      if(licenseImageFile) {
-        formData.append("licenseImageUrl", licenseImageFile);
       }
 
       if(userData?.userName === "Admin One") {
@@ -139,40 +102,69 @@ const UserDetails = ({userId, setIsClick, onDelete}) => {
         return;
       }
 
-      const response = await updateUserData(id, formData);
+      const formData = new FormData();
+      formData.append("userName", userData?.userName || "");
+      formData.append("email", userData?.email || "");
 
-      if(!response.success) {
-        toast.error(response?.message || "Failed to update user.");
+      if(userData?.password?.trim()) {
+        formData.append("password", userData?.password.trim());
+      }
+
+      formData.append("role", userData?.role);
+
+      if(profileImageFile) {
+        formData.append("profileImageUrl", profileImageFile);
+      }
+
+      formData.append("accountStatus", userData?.accountStatus);
+      
+      if (userData?.role === "Customer") {
+        const phoneNumber = userData?.phoneNumber ?? initialUserData?.phoneNumber;
+        const dob = userData?.dateOfBirth ?? initialUserData?.dateOfBirth;
+        const vs = userData?.verificationStatus ?? initialUserData?.verificationStatus;
+
+        if (phoneNumber) formData.append("phoneNumber", phoneNumber);
+        if (dob) formData.append("dateOfBirth", dob);
+        if (vs) formData.append("verificationStatus", vs);
+
+        if (licenseImageFile) formData.append("licenseImageUrl", licenseImageFile);
+      }
+
+      const updatedUser = await onUpdate(id, formData);
+      await fetchUser();
+
+      if(!updatedUser) {
         return;
       }
 
-      if(response?.data) {
-        setUserData((prev) => ({
-          ...prev,
-          ...response.data,
-          licenseImageUrl: response.data.licenseImageUrl || prev?.licenseImageUrl
-        }));
+      setUserData((prev) => ({
+        ...prev,
+        ...updatedUser,
+        licenseImageUrl: c?.licenseImageUrl ?? updatedUser?.licenseImageUrl ?? prev?.licenseImageUrl ?? "",
+        verificationStatus: c?.verificationStatus ?? updatedUser?.verificationStatus ?? prev?.verificationStatus ?? "pending",
+      }));
 
-        setInitialUserData((prev) => ({
-          ...prev,
-          ...response.data,
-          licenseImageUrl: response.data.licenseImageUrl || prev?.licenseImageUrl
-        }));
+      setInitialUserData((prev) => ({
+        ...prev,
+        ...updatedUser,
+        licenseImageUrl: c?.licenseImageUrl ?? updatedUser?.licenseImageUrl ?? prev?.licenseImageUrl ?? "",
+        verificationStatus: c?.verificationStatus ?? updatedUser?.verificationStatus ?? prev?.verificationStatus ?? "pending",
+      }));
 
-        setProfileImageFile(null);
-        setLicenseImageFile(null);
+      setPreviewProfileImageById(updatedUser?.profileImageUrl || previewProfileImageById || null);
+      
+      const c = updatedUser?.customerProfile;
 
-        setPreviewProfileImageById(response.data?.profileImageUrl || currentProfilePreview || null);
-        setPreviewLicenseImageById(response.data?.licenseImageUrl || currentLicensePreview || null);
+      setPreviewLicenseImageById(
+        c?.licenseImageUrl ?? updatedUser?.licenseImageUrl ?? previewLicenseImageById ?? null
+      );
 
-        toast.success(response?.message || "User updated successfully!");
-        setIsEdit(false);
-      }
-
-      console.log("response after update: ", response);
+      setProfileImageFile(null);
+      setLicenseImageFile(null);
+      setIsEdit(false);
     } catch (error) {
-      console.log("An Error Occurred at handleUpdateUser()", error);
-      toast.error("Unable to update user.");
+      console.log("An Error Occurred at handleUpdateUser() in UserDetails.jsx", error);
+      toast.error("Failed to update user");
     } finally {
       setIsLoading(false);
     }
@@ -306,7 +298,7 @@ const UserDetails = ({userId, setIsClick, onDelete}) => {
               value={formatDateField(field.name, userData?.[field.name])}
               placeholder={field.placeholder}
               onChange={(e) => handleInputChange(field.name, e.target.value)}
-              disabled={!isEdit}
+              readOnly={!isEdit}
               showPasswordToggle={field.showPasswordToggle}
               onTogglePassword={() => setIsShowPassword(!isShowPassword)}
               showPassword={isShowPassword}

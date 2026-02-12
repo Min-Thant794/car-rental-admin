@@ -1,7 +1,7 @@
 import React from 'react'
 import { FaEye, FaEyeSlash } from 'react-icons/fa'
 
-const UserInputField = ({ label, name, type, value, onChange, disabled, showPasswordToggle, onTogglePassword, showPassword, placeholder, options}) => {
+const UserInputField = ({ label, name, type, value, onChange, readOnly, showPasswordToggle, onTogglePassword, showPassword, placeholder, options}) => {
   return (
     <div className='grid grid-cols-[160px_1fr] gap-3'>
         <label htmlFor={name} className='font-semibold tracking-wide'>{label}</label>
@@ -13,7 +13,7 @@ const UserInputField = ({ label, name, type, value, onChange, disabled, showPass
                         name={name}
                         value={value ?? ""}
                         onChange={onChange}
-                        disabled={disabled}
+                        disabled={readOnly}
                         className='outline-none cursor-pointer w-full'
                     >
                         {options.map((opt) => (
@@ -30,10 +30,10 @@ const UserInputField = ({ label, name, type, value, onChange, disabled, showPass
                         <input
                             id={name}
                             type={showPasswordToggle && !showPassword ? 'password' : type}
-                            value={value || "Not Provided"}
+                            value={value ?? ""}
                             onChange={onChange}
-                            disabled={disabled}
-                            placeholder={placeholder}
+                            readOnly={readOnly}
+                            placeholder={placeholder ?? "Not Provided"}
                             className='outline-none w-full'
                         />
                         {showPasswordToggle && (

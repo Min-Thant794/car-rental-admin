@@ -1,22 +1,15 @@
 import React, { useState } from 'react'
 import defaultImage from '../assets/default image.png'
-import { FaEdit } from 'react-icons/fa';
 import DisplayUser from '../components/DisplayUser'
+import CreateUser from '../components/CreateUser'
 
 const ManageUsers = () => {
 
   const[addUser, setAddUser] = useState(false);
-  const [ isLoading, setIsLoading ] = useState(false);
-  const [previewProfileImage, setPreviewProfileImage] = useState(defaultImage);
-  const [previewLicenseImage, setPreviewLicenseImage] = useState(defaultImage);
 
   const toggleAddUser = () => {
     setAddUser(true);
   }
-
-  const handleSubmit = () => {
-
-  };
 
   return (
     <div className='relative'>
@@ -32,37 +25,12 @@ const ManageUsers = () => {
       {
         addUser &&
         <div 
-        onClick={() => {
-          if(!isLoading) {
-            setAddUser(false);
-          }
+        onClick={(e) => {
+          e.stopPropagation();
+          setAddUser(false);
         }}
-        className='fixed shadow-md inset-0 flex items-center justify-center bg-black/10 z-30'>
-          <form
-          onSubmit={handleSubmit}
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
-          className='w-5/10 grid grid-cols-7 bg-[#434343] rounded-lg px-5 py-2'>
-            <div className='relative col-span-3 h-8/10 mt-5'>
-              <img src={previewProfileImage} className='object-cover w-full h-full rounded-lg bg-[#a4a4a4]' />
-              <div>
-                <FaEdit className='text-amber-50' />
-                <div className='font-semibold text-amber-50 tracking-wide'>
-                  Upload Profile Image
-                </div>
-              </div>
-            </div>
-            <div className='relative col-span-3 h-8/10 mt-5'>
-              <img src={previewProfileImage} className='object-cover w-full h-full rounded-lg bg-[#a4a4a4]' />
-              <div>
-                <FaEdit className='text-amber-50' />
-                <div className='font-semibold text-amber-50 tracking-wide'>
-                  Upload License Image
-                </div>
-              </div>
-            </div>
-          </form>
+        className={`fixed shadow-md ${addUser ? "opacity-100 translate-y-1" : "opacity-0 -translate-y-1 pointer-events-none"} inset-0 flex items-center justify-center bg-black/10 z-30`}>
+          <CreateUser/>
         </div>
       }
       <DisplayUser/>
