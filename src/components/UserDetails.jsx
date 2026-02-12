@@ -14,6 +14,9 @@ const UserDetails = ({userId, setIsClick, onDelete}) => {
   const [ isShowPassword, setIsShowPassword ] = useState(false);
   const [ previewProfileImageById, setPreviewProfileImageById] = useState(null);
   const [ previewLicenseImageById, setPreviewLicenseImageById] = useState(null);
+  const [ profileImageFile, setProfileImageFile ] = useState(null);
+  const [ licenseImageFile, setLicenseImageFile ] = useState(null);
+  const [ initialUserData, setInitialUserData ] = useState(null);
   const [isDelete, setIsDelete] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
 
@@ -57,10 +60,15 @@ const UserDetails = ({userId, setIsClick, onDelete}) => {
         const userData = fetchedUsers.find((u) => u._id === userId);
 
         setUserData(userData);
+        setInitialUserData(userData);
         setPreviewProfileImageById(userData?.profileImageUrl);
-        setPreviewLicenseImageById(userData?.licenseImageUrl)
+        setPreviewLicenseImageById(userData?.licenseImageUrl);
+        setProfileImageFile(null);
+        setLicenseImageFile(null);
         toast.success(response?.message);
       }
+
+      console.log("response after fetch", response);
     } catch (error) {
       console.log("An Error Occurred at fetchAllUser()", error);
       toast.error("Failed to fetch data");
@@ -76,12 +84,28 @@ const UserDetails = ({userId, setIsClick, onDelete}) => {
     }
   }, [userId]);
 
-  const uploadProfileImg = (userId, file) => {
+  const uploadProfileImg = (file) => {
     if(!file) return;
     
+    setProfileImageFile(file);
+    setPreviewProfileImageById(URL.createObjectURL(file));
+  }
+
+  const uploadLicenseImg = (file) => {
+    if(!file) return;
+
+    setLicenseImageFile(file);
+    setPreviewLicenseImageById((prev) => {
+      if (prev?.startsWith("blob:")) URL.revokeObjectURL(prev);
+      return URL.createObjectURL(file);
+    });
   }
 
   const handleUpdateUser = async (id) => {
+    // Capture previews BEFORE any async calls to avoid stale closure issues
+    const currentProfilePreview = previewProfileImageById;
+    const currentLicensePreview = previewLicenseImageById;
+
     try {
       setIsLoading(true);
 
@@ -94,7 +118,7 @@ const UserDetails = ({userId, setIsClick, onDelete}) => {
       formData.append("userName", userData?.userName || "");
       formData.append("email", userData?.email || "");
       formData.append("phoneNumber", userData?.phoneNumber || "");
-      formData.append("dateOfBirth", userData?.verificationStatus || "");
+      formData.append("dateOfBirth", userData?.dateOfBirth || "");
       formData.append("role", userData?.role);
       formData.append("accountStatus", userData?.accountStatus);
 
@@ -102,14 +126,12 @@ const UserDetails = ({userId, setIsClick, onDelete}) => {
         formData.append("password", userData.password.trim());
       }
 
-      if(previewProfileImageById instanceof File) {
-        setPreviewProfileImageById();
-        formData.append("profileImageUrl", previewProfileImageById);
+      if(profileImageFile) {
+        formData.append("profileImageUrl", profileImageFile);
       }
 
-      if(previewLicenseImageById instanceof File) {
-        setPreviewLicenseImageById();
-        formData.append("licenseImageUrl", previewLicenseImageById);
+      if(licenseImageFile) {
+        formData.append("licenseImageUrl", licenseImageFile);
       }
 
       if(userData?.userName === "Admin One") {
@@ -125,11 +147,29 @@ const UserDetails = ({userId, setIsClick, onDelete}) => {
       }
 
       if(response?.data) {
-        setUserData(response.data);
+        setUserData((prev) => ({
+          ...prev,
+          ...response.data,
+          licenseImageUrl: response.data.licenseImageUrl || prev?.licenseImageUrl
+        }));
+
+        setInitialUserData((prev) => ({
+          ...prev,
+          ...response.data,
+          licenseImageUrl: response.data.licenseImageUrl || prev?.licenseImageUrl
+        }));
+
+        setProfileImageFile(null);
+        setLicenseImageFile(null);
+
+        setPreviewProfileImageById(response.data?.profileImageUrl || currentProfilePreview || null);
+        setPreviewLicenseImageById(response.data?.licenseImageUrl || currentLicensePreview || null);
 
         toast.success(response?.message || "User updated successfully!");
         setIsEdit(false);
       }
+
+      console.log("response after update: ", response);
     } catch (error) {
       console.log("An Error Occurred at handleUpdateUser()", error);
       toast.error("Unable to update user.");
@@ -158,9 +198,12 @@ const UserDetails = ({userId, setIsClick, onDelete}) => {
   }
 
   const clearForm = () => {
+    setUserData(initialUserData);
     setIsEdit(false);
-    setPreviewProfileImageById(userData?.profileImageUrl);
-    setPreviewLicenseImageById(userData?.licenseImageUrl);
+    setPreviewProfileImageById(initialUserData?.profileImageUrl || null);
+    setPreviewLicenseImageById(initialUserData?.licenseImageUrl || null);
+    setProfileImageFile(null);
+    setLicenseImageFile(null);
   }
 
   const handleSubmit = (id) => {
@@ -215,24 +258,40 @@ const UserDetails = ({userId, setIsClick, onDelete}) => {
                 </div>
                 <input 
                 type="file"
-                multiple={false}
                 accept='image/*'
                 id='profileImg'
                 className='hidden'
                 onChange={(e) => {
                   e.stopPropagation();
-                  uploadProfileImg(userId, e.target.files[0])
+                  uploadProfileImg(e.target.files[0]);
                 }}
                 />
               </div>
             }
           </div>
           <div className='relative w-full'>
-            <img src={previewLicenseImageById || defaultImage} className='w-full rouned-lg h-65' />
+            <img src={previewLicenseImageById || defaultImage} className='w-full rounded-lg h-65' />
             {
               (isEdit && userData?.role === "Customer")  &&
-              <div className='absolute right-3 rounded-lg px-3 py-2 text-amber-50 cursor-pointer active:opacity-65 hover:opacity-80 bottom-3 bg-[#434343]'>
-                Upload License Image
+              <div>
+                <div 
+                onClick={() => document.getElementById("licenseImg").click()}
+                className='absolute right-3 rounded-lg px-3 py-2 text-amber-50 cursor-pointer active:opacity-65 hover:opacity-80 bottom-3 bg-[#434343]'>
+                  Upload License Image
+                </div>
+                <input 
+                type="file"
+                accept="image/*"
+                id="licenseImg"
+                className="hidden"
+                onChange={(e) => {
+                  e.stopPropagation();
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  uploadLicenseImg(file);
+                  e.target.value = "";
+                }}
+                  />
               </div>
             }
           </div>

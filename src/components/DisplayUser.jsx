@@ -30,6 +30,10 @@ const DisplayUser = () => {
     }
   }
 
+  const handleUpdateUser = async (id, payload) => {
+    
+  }
+
   const handleDeleteUser = async (id) => {
     const prev = allUsers;
     setAllUsers((p) => p.filter((u) => u._id !== id));
@@ -159,6 +163,7 @@ const DisplayUser = () => {
           setIsClick = {setIsClick}
           userId={selectedUserId}
           onDelete={handleDeleteUser}
+          onUpdate = {handleUpdateUser}
           />
         </div>
       }
