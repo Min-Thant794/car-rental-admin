@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { getAllUser, updateUserData, deleteUser } from '../services/user.service'
+import { getAllUser, updateUserData } from '../services/user.service'
 import { toast } from 'react-toastify';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import UserInputField from './UserInputField'
@@ -75,8 +75,59 @@ const UserDetails = ({userId, setIsClick, onDelete}) => {
     }
   }, [userId]);
 
-  const handleUpdateUser = async (id) => {
+  const uploadProfileImg = (userId, file) => {
+    if(!file) return;
+    
+  }
 
+  const handleUpdateUser = async (id) => {
+    try {
+      setIsLoading(true);
+
+      if(!id) {
+        toast.error("Unable to update user. User ID not found.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("userName", userData?.userName || "");
+      formData.append("email", userData?.email || "");
+      formData.append("phoneNumber", userData?.phoneNumber || "");
+      formData.append("dateOfBirth", userData?.verificationStatus || "");
+      formData.append("role", userData?.role);
+      formData.append("accountStatus", userData?.accountStatus);
+
+      if(userData?.password?.trim()) {
+        formData.append("password", userData.password.trim());
+      }
+
+      if(previewProfileImageById instanceof File) {
+        formData.append("profileImageUrl", previewProfileImageById);
+      }
+
+      if(previewLicenseImageById instanceof File) {
+        formData.append("licenseImageUrl", previewLicenseImageById);
+      }
+
+      const response = await updateUserData(id, formData);
+
+      if(!response.success) {
+        toast.error(response?.message || "Failed to update user.");
+        return;
+      }
+
+      if(response?.data) {
+        setUserData(response.data);
+
+        toast.success(response?.message || "User updated successfully!");
+        setIsEdit(false);
+      }
+    } catch (error) {
+      console.log("An Error Occurred at handleUpdateUser()", error);
+      toast.error("Unable to update user.");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   const handleDeleteUser = async (id) => {
@@ -99,7 +150,8 @@ const UserDetails = ({userId, setIsClick, onDelete}) => {
   }
 
   const handleSubmit = () => {
-    
+    if(!isEdit) return;
+    handleUpdateUser();
   }
 
   if(isLoading) {
@@ -141,15 +193,30 @@ const UserDetails = ({userId, setIsClick, onDelete}) => {
             <img src={userData?.profileImageUrl || defaultImage} className='w-full rounded-lg h-65' />
             {
               isEdit &&
-              <div className='absolute right-3 rounded-lg px-3 py-2 text-amber-50 cursor-pointer active:opacity-65 hover:opacity-80 bottom-3 bg-[#434343]'>
-                Upload Profile Picture
+              <div>
+                <div 
+                onClick={()=> document.getElementById("profileImg").click()}
+                className='absolute right-3 rounded-lg px-3 py-2 text-amber-50 cursor-pointer active:opacity-65 hover:opacity-80 bottom-3 bg-[#434343]'>
+                  Upload Profile Picture
+                </div>
+                <input 
+                type="file"
+                multiple={false}
+                accept='image/*'
+                id='profileImg'
+                className='hidden'
+                onChange={(e) => {
+                  e.stopPropagation();
+
+                }}
+                />
               </div>
             }
           </div>
           <div className='relative w-full'>
             <img src={userData?.licenseImageUrl || defaultImage} className='w-full rouned-lg h-65' />
             {
-              isEdit && userData?.licenseImageUrl  &&
+              (isEdit && userData?.role === "Customer")  &&
               <div className='absolute right-3 rounded-lg px-3 py-2 text-amber-50 cursor-pointer active:opacity-65 hover:opacity-80 bottom-3 bg-[#434343]'>
                 Upload License Image
               </div>
@@ -207,13 +274,7 @@ const UserDetails = ({userId, setIsClick, onDelete}) => {
             {
               isEdit &&
               <button
-              type='submit' 
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsEdit(false);
-                setIsClick(false);
-                handleUpdateUser(userId);
-              }}
+              type='submit'
               className={`bg-[#434343]  mt-5 text-amber-50 rounded-lg px-3 py-2 w-2/15 font-semibold tracking-wide text-center active:opacity-65 hover:opacity-80 cursor-pointer`}>
                 Save
               </button>

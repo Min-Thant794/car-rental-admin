@@ -8,7 +8,7 @@ const UserDetailsLoadingSkeleton = () => {
     >
       {/* Header */}
       <div className='flex items-center'>
-        <div className='skeleton-shimmer h-8 w-32 bg-[#8a8a8a] rounded'></div>
+        <div className='shimmer h-8 w-32 bg-[#8a8a8a] rounded'></div>
       </div>
 
       {/* Images Section */}
@@ -33,9 +33,9 @@ const UserDetailsLoadingSkeleton = () => {
         {Array.from({ length: 10 }).map((_, index) => (
           <div key={index} className='flex gap-2'>
             {/* Label */}
-            <div className='skeleton-shimmer h-7 w-1/2 bg-[#8a8a8a] rounded'></div>
+            <div className='shimmer h-5 w-1/2 bg-[#8a8a8a] rounded'></div>
             {/* Input Field */}
-            <div className='skeleton-shimmer h-7 w-1/2 bg-[#8a8a8a] rounded-lg'></div>
+            <div className='shimmer h-5 w-1/2 bg-[#8a8a8a] rounded-lg'></div>
           </div>
         ))}
       </div>
@@ -43,10 +43,10 @@ const UserDetailsLoadingSkeleton = () => {
       {/* Action Buttons */}
       <div className='flex gap-3 w-full justify-between'>
         {/* Delete Button */}
-        <div className='skeleton-shimmer h-10 w-24 bg-[#434343] rounded-lg'></div>
+        <div className='shimmer h-10 w-24 bg-[#8a8a8a] rounded-lg'></div>
         
         {/* Edit Button */}
-        <div className='skeleton-shimmer h-10 w-20 bg-[#434343] rounded-lg'></div>
+        <div className='shimmer h-10 w-20 bg-[#8a8a8a] rounded-lg'></div>
       </div>
     </div>
   )
