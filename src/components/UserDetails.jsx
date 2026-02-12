@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { getAllUser, updateUserData } from '../services/user.service'
 import { toast } from 'react-toastify';
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import UserInputField from './UserInputField'
 import { IoClose } from 'react-icons/io5';
 import defaultImage from '../assets/default image.png';
@@ -13,8 +12,8 @@ const UserDetails = ({userId, setIsClick, onDelete}) => {
   const [ userData, setUserData ] = useState([]);
   const [ isLoading, setIsLoading ] = useState(false);
   const [ isShowPassword, setIsShowPassword ] = useState(false);
-  const [previewProfileImageById, setPreviewProfileImageById] = useState(null);
-  const [previewLicenseImageById, setPreviewLicenseImageById] = useState(null);
+  const [ previewProfileImageById, setPreviewProfileImageById] = useState(null);
+  const [ previewLicenseImageById, setPreviewLicenseImageById] = useState(null);
   const [isDelete, setIsDelete] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
 
@@ -58,6 +57,8 @@ const UserDetails = ({userId, setIsClick, onDelete}) => {
         const userData = fetchedUsers.find((u) => u._id === userId);
 
         setUserData(userData);
+        setPreviewProfileImageById(userData?.profileImageUrl);
+        setPreviewLicenseImageById(userData?.licenseImageUrl)
         toast.success(response?.message);
       }
     } catch (error) {
@@ -102,11 +103,18 @@ const UserDetails = ({userId, setIsClick, onDelete}) => {
       }
 
       if(previewProfileImageById instanceof File) {
+        setPreviewProfileImageById();
         formData.append("profileImageUrl", previewProfileImageById);
       }
 
       if(previewLicenseImageById instanceof File) {
+        setPreviewLicenseImageById();
         formData.append("licenseImageUrl", previewLicenseImageById);
+      }
+
+      if(userData?.userName === "Admin One") {
+        toast.error("This user cannot be edited");
+        return;
       }
 
       const response = await updateUserData(id, formData);
@@ -149,9 +157,15 @@ const UserDetails = ({userId, setIsClick, onDelete}) => {
     }
   }
 
-  const handleSubmit = () => {
+  const clearForm = () => {
+    setIsEdit(false);
+    setPreviewProfileImageById(userData?.profileImageUrl);
+    setPreviewLicenseImageById(userData?.licenseImageUrl);
+  }
+
+  const handleSubmit = (id) => {
     if(!isEdit) return;
-    handleUpdateUser();
+    handleUpdateUser(id);
   }
 
   if(isLoading) {
@@ -184,13 +198,13 @@ const UserDetails = ({userId, setIsClick, onDelete}) => {
       onSubmit={(e) => {
         e.preventDefault();
         e.stopPropagation();
-        handleSubmit();
+        handleSubmit(userId);
       }}
       className='relative w-full h-full justify-center items-center'
       >
         <div className='w-full h-fit grid grid-cols-2 py-5 gap-5 col-span-3 rounded-lg'>
           <div className='relative w-full'>
-            <img src={userData?.profileImageUrl || defaultImage} className='w-full rounded-lg h-65' />
+            <img src={previewProfileImageById || defaultImage} className='w-full rounded-lg h-65' />
             {
               isEdit &&
               <div>
@@ -207,14 +221,14 @@ const UserDetails = ({userId, setIsClick, onDelete}) => {
                 className='hidden'
                 onChange={(e) => {
                   e.stopPropagation();
-
+                  uploadProfileImg(userId, e.target.files[0])
                 }}
                 />
               </div>
             }
           </div>
           <div className='relative w-full'>
-            <img src={userData?.licenseImageUrl || defaultImage} className='w-full rouned-lg h-65' />
+            <img src={previewLicenseImageById || defaultImage} className='w-full rouned-lg h-65' />
             {
               (isEdit && userData?.role === "Customer")  &&
               <div className='absolute right-3 rounded-lg px-3 py-2 text-amber-50 cursor-pointer active:opacity-65 hover:opacity-80 bottom-3 bg-[#434343]'>
@@ -257,7 +271,7 @@ const UserDetails = ({userId, setIsClick, onDelete}) => {
               <div 
               onClick={(e) => {
                 e.stopPropagation();
-                setIsEdit(false)
+                clearForm();
               }}
               className='absolute right-25 border-2 border-[#434343]  mt-5 rounded-lg px-3 py-2 w-2/15 font-semibold tracking-wide text-center active:opacity-65 hover:opacity-80 cursor-pointer'>
                 Cancel
