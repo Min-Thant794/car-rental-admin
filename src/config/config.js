@@ -10,7 +10,7 @@ export const API_ROUTES = {
     GET_CURRENT_ADMIN: "/user/auth/admin/me",
     GET_ALL_USER: "/user",
     UPDATE_USER: "/user",
-    POST_NEW_USER: "/user",
+    POST_NEW_USER: "/user/user-create-by-admin",
     DELETE_USER: "/user",
 
     //cars

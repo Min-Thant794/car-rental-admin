@@ -170,7 +170,7 @@ const CreateUser = ({setAddUser, triggerRefreshUsers }) => {
             resetForm();  
             setAddUser(false)
           }}
-          className='cursor-pointer active:opacity-65 hover:opacity-80'><IoClose/></div>
+          className='cursor-pointer active:opacity-65 hover:opacity-80'><IoClose onClick={() => {setAddUser(false)}}/></div>
         </div>
         <form
         onSubmit={async (e) => {

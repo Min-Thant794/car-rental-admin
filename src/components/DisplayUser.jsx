@@ -158,7 +158,6 @@ const DisplayUser = ({ refreshUsers }) => {
       <div 
       onClick={(e) => {
         e.stopPropagation();
-        setIsClick(true);
       }}
       className='grid grid-cols-4 gap-3 pt-5'>
         {
@@ -167,6 +166,7 @@ const DisplayUser = ({ refreshUsers }) => {
             key={u._id}
             onClick={() => {
               setSelectedUserId(u._id);
+              setIsClick(true);
             }}
             className='grid grid-cols-5 hover:bg-[#434343] cursor-pointer transition hover:-translate-y-1 hover:rounded-full hover:text-amber-50 duration-500 shadow-lg justify-center items-center rounded-full px-1 bg-[#a4a4a4]'>
               <div className='col-span-1'>
