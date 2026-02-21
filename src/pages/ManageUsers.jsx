@@ -30,7 +30,9 @@ const ManageUsers = () => {
           setAddUser(false);
         }}
         className={`fixed shadow-md ${addUser ? "opacity-100 translate-y-1" : "opacity-0 -translate-y-1 pointer-events-none"} inset-0 flex items-center justify-center bg-black/10 z-30`}>
-          <CreateUser/>
+          <CreateUser
+          setAddUser={setAddUser}
+          />
         </div>
       }
       <DisplayUser/>
