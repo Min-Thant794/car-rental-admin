@@ -4,16 +4,16 @@ import { API_ROUTES } from "../config/config";
 export const createUser = async (payload) => {
     try {
         const response = await axiosInstance.post(API_ROUTES.POST_NEW_USER, payload);
-        console.log("createUser() reposne: ", response.data);
+        console.log("createUser() response: ", response.data);
         return response.data;
     } catch (error) {
         console.log("An Error Occurred at createUser()", error);
         
         return {
             success: false,
-            message: error.response?.data.message || "Internal Server Error",
+            message: error.response?.data?.message || "Internal Server Error",
             error
-    }
+        };
     }
 }
 
@@ -27,7 +27,7 @@ export const getAllUser = async() => {
 
         return {
             success: false,
-            message: error.response?.data.message || "Internal Server Error!",
+            message: error.response?.data?.message || "Internal Server Error!",
             error
         }
     }
@@ -42,7 +42,7 @@ export const getCurrentAdmin = async (params) => {
         console.log("An Error Occurred at getCurrentAdmin()", error);
         return {
             success: false,
-            message: error.response?.data.message || "Internal Server Error!",
+            message: error.response?.data?.message || "Internal Server Error!",
             error
         }
     }
@@ -58,7 +58,7 @@ export const updateUserData = async (id, payload) => {
 
         return {
             success: false,
-            message: error.response?.data.message || "Internal Server Error!",
+            message: error.response?.data?.message || "Internal Server Error!",
             error
         }
     }
@@ -74,7 +74,7 @@ export const deleteUser = async(id) => {
 
         return {
             success: false,
-            message: error.response?.data.message || "Internal Server Error!",
+            message: error.response?.data?.message || "Internal Server Error!",
             error
         }
     }

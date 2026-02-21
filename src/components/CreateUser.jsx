@@ -37,7 +37,7 @@ const CreateUser = ({setAddUser, triggerRefreshUsers }) => {
     
     { name: 'phoneNumber', label: 'Phone Number: ', type: 'text', customerOnly: true},
     { name: 'dateOfBirth', label: 'Date of Birth: ', type: 'text', customerOnly: true},
-    { name: 'verificationStatus', label: 'Verification Status: ', type: 'text', options: ["pending", "verified", "rejected"], customerOnly: true},
+    { name: 'verificationStatus', label: 'Verification Status: ', type: 'date', options: ["pending", "verified", "rejected"], customerOnly: true},
   ];
 
   const visibleFields = fields.filter(field => !field.customerOnly || form.role === "Customer");
@@ -118,10 +118,11 @@ const CreateUser = ({setAddUser, triggerRefreshUsers }) => {
       toast.success(response?.message || "A new user is successfully created!");
       triggerRefreshUsers();
       setAddUser(false);
+      return true;
     } catch (error) {
       console.log("An Error Occurred at handleCreateUser()", error);
       toast.error("Failed to create user!");
-      return
+      return false;
     } finally {
       setIsLoading(false);
     }
@@ -129,7 +130,18 @@ const CreateUser = ({setAddUser, triggerRefreshUsers }) => {
 
   const resetForm = () => {
     setForm(initialForm);
-    setAddUser(false);
+    setFileForProfileImg(null);
+    setFileForLicenseImg(null);
+    setUploadProfileImg(defaultImage);
+    setUploadLicenseImg(defaultImage);
+
+    if(profileInputRef.current) {
+      profileInputRef.current.value = "";
+    }
+
+    if(profileInputRef.current) {
+      licenseInputRef.current.value = "";
+    }
   }
 
   useEffect(() => {
@@ -154,14 +166,16 @@ const CreateUser = ({setAddUser, triggerRefreshUsers }) => {
         <div className='flex text-2xl px-5 font-bold items-center tracking-wide justify-between'>
           <div>Create User</div>
           <div 
-          onClick={() => setAddUser(false)}
+          onClick={() => {
+            resetForm();  
+            setAddUser(false)
+          }}
           className='cursor-pointer active:opacity-65 hover:opacity-80'><IoClose/></div>
         </div>
         <form
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
           e.preventDefault();
-          handleCreateUser();
-          resetForm();
+          await handleCreateUser();
         }}
         className='relative'
         >
@@ -254,7 +268,10 @@ const CreateUser = ({setAddUser, triggerRefreshUsers }) => {
             <div className='absolute top-130 right-0 w-full flex justify-end items-center gap-3'>
               <button 
               type='button'
-              onClick={resetForm}
+              onClick={() => {
+                resetForm();
+                setAddUser(false);
+              }}
               className='w-2/15 px-3 py-2 rounded-lg font-semibold text-center cursor-pointer active:opacity-65 hover:opacity-80 tracking-wide text-amber-50 bg-[#ff0000]'>Cancel</button>
               <button 
               type='submit'
