@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { IoClose } from 'react-icons/io5';
 import defaultImage from '../assets/default image.png'
 import {createUser} from '../services/user.service'
@@ -33,11 +33,14 @@ const CreateUser = ({setAddUser}) => {
     { name: 'userName', label: 'Enter username: ', type: 'text'},
     { name: 'email', label: 'Enter email: ', type: 'email'},
     { name: 'password', label: 'Enter password: ', type: 'text'},
-    { name: 'phoneNumber', label: 'Phone Number: ', type: 'text'},
     { name: 'role', label: 'Role: ', type: 'text', options: ["Admin", "Customer"]},
-    { name: 'dateOfBirth', label: 'Date of Birth: ', type: 'text'},
-    { name: 'verificationStatus', label: 'Verification Status: ', type: 'text', options: ["pending", "verified", "rejected"]},
+    
+    { name: 'phoneNumber', label: 'Phone Number: ', type: 'text', customerOnly: true},
+    { name: 'dateOfBirth', label: 'Date of Birth: ', type: 'text', customerOnly: true},
+    { name: 'verificationStatus', label: 'Verification Status: ', type: 'text', options: ["pending", "verified", "rejected"], customerOnly: true},
   ];
+
+  const visibleFields = fields.filter(field => !field.customerOnly || form.role === "Customer");
 
   const uploadProfileImage = (file) => {
     if(!file) {
@@ -69,9 +72,9 @@ const CreateUser = ({setAddUser}) => {
   const handleCreateUser = async () => {
     try {
       setIsLoading(true);
-      const requiredField = ["userName", "email", "password", "phoneNumber", "role", "dateOfBirth", "verificationStatus"]
+      const requiredField = form.role === "Customer" ? ["userName", "email", "password", "phoneNumber", "role", "dateOfBirth", "verificationStatus"] : ["userName", "email", "password", "role"]
 
-      console.log("Submit form", form);
+      //console.log("Submit form", form);
 
       const missingField = requiredField.filter((k) => {
         const v = form[k];
@@ -89,16 +92,19 @@ const CreateUser = ({setAddUser}) => {
       if(form.password.trim()) {
         fd.append("password", form.password);
       }
-      fd.append("phoneNumber", form.phoneNumber);
       fd.append("role", form.role);
-      fd.append("dateOfBirth", form.dateOfBirth);
-      fd.append("verificationStatus", form.verificationStatus);
+      
+      if (form.role === "Customer") {
+        fd.append("phoneNumber", form.phoneNumber);
+        fd.append("dateOfBirth", form.dateOfBirth);
+        fd.append("verificationStatus", form.verificationStatus);
+      }
 
       if(fileForProfileImg) {
         fd.append("profileImageUrl", fileForProfileImg);
       }
 
-      if(fileForLicenseImg) {
+      if(form.role === "Customer" && fileForLicenseImg) {
         fd.append("licenseImageUrl", fileForLicenseImg);
       }
 
@@ -125,6 +131,19 @@ const CreateUser = ({setAddUser}) => {
     setAddUser(false);
   }
 
+  useEffect(() => {
+    if(form.role !== "Customer") {
+      setFileForLicenseImg(null);
+      setUploadLicenseImg(defaultImage);
+      setForm(prev => ({
+        ...prev,
+        phoneNumber: "",
+        dateOfBirth: "",
+        verificationStatus: ""
+      }));
+    }
+  }, [form.role]);
+
   if(isLoading) return  <div>Loading...</div>
 
   return (
@@ -142,6 +161,7 @@ const CreateUser = ({setAddUser}) => {
           e.preventDefault();
           handleCreateUser();
         }}
+        className='relative'
         >
           <div className='w-full h-fit grid grid-cols-2 py-5 gap-5 col-span-3 rounded-lg'>
               <div className='relative w-full'>
@@ -164,28 +184,32 @@ const CreateUser = ({setAddUser}) => {
               </div>
               <div className='relative w-full'>
                 <img src={uploadLicenseImg} className='w-full rounded-lg h-65' />
-                  <div>
-                    <div 
-                    onClick={() => licenseInputRef.current?.click()}
-                    className='absolute right-3 rounded-lg px-3 py-2 text-amber-50 cursor-pointer active:opacity-65 hover:opacity-80 bottom-3 bg-[#434343]'>
-                      Upload License Image
-                    </div>
-                    <input 
-                    ref={licenseInputRef}
-                    type="file"
-                    accept="image/*"
-                    id="licenseImg"
-                    className="hidden"
-                    onChange={(e) => {
-                      uploadLicenseImage(e.target.files[0]);
-                    }}
-                      />
-                  </div>
+                  {
+                    form.role === "Customer" && (
+                      <div>
+                        <div 
+                        onClick={() => licenseInputRef.current?.click()}
+                        className='absolute right-3 rounded-lg px-3 py-2 text-amber-50 cursor-pointer active:opacity-65 hover:opacity-80 bottom-3 bg-[#434343]'>
+                          Upload License Image
+                        </div>
+                        <input 
+                        ref={licenseInputRef}
+                        type="file"
+                        accept="image/*"
+                        id="licenseImg"
+                        className="hidden"
+                        onChange={(e) => {
+                          uploadLicenseImage(e.target.files[0]);
+                        }}
+                          />
+                      </div>
+                    )
+                  }
               </div>
             </div>
             <div className='w-full grid grid-cols-2 gap-2 mt-5 px-5 font-semibold tracking-wide'>
               {
-                fields.map((field) => (
+                visibleFields.map((field) => (
                   <div 
                   key={field.name}
                   className='flex w-full'>
@@ -201,7 +225,7 @@ const CreateUser = ({setAddUser}) => {
                           value={form[field.name] || ""}
                           onChange={(e) => handleOnChange(field.name, e.target.value)}
                           className='outline-none cursor-pointer w-full px-2 py-1 flex items-center'>
-                            <option value="">Choose </option>
+                            <option>Choose {field.name}</option>
                             {
                               field.options.map((option) => (
                                 <option 
@@ -225,7 +249,7 @@ const CreateUser = ({setAddUser}) => {
                 ))
               }
             </div>
-            <div className='flex justify-end items-center gap-3'>
+            <div className='absolute top-130 right-0 w-full flex justify-end items-center gap-3'>
               <button 
               type='button'
               onClick={resetForm}

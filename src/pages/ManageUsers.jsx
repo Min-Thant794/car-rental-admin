@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import defaultImage from '../assets/default image.png'
 import DisplayUser from '../components/DisplayUser'
 import CreateUser from '../components/CreateUser'
 
