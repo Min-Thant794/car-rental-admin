@@ -111,7 +111,7 @@ const CreateUser = ({setAddUser, triggerRefreshUsers }) => {
       const response = await createUser(fd);
 
       if(response.success === false) {
-        toast.error(response?.message || "Failed to create car");
+        toast.error(response?.message || "Failed to create user.");
         return;
       }
 
@@ -120,7 +120,7 @@ const CreateUser = ({setAddUser, triggerRefreshUsers }) => {
       setAddUser(false);
     } catch (error) {
       console.log("An Error Occurred at handleCreateUser()", error);
-      toast.error("Failed to create car!");
+      toast.error("Failed to create user!");
       return
     } finally {
       setIsLoading(false);
@@ -161,6 +161,7 @@ const CreateUser = ({setAddUser, triggerRefreshUsers }) => {
         onSubmit={(e) => {
           e.preventDefault();
           handleCreateUser();
+          resetForm();
         }}
         className='relative'
         >

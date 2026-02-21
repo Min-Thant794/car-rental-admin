@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import {getAllUser, updateUserData, deleteUser} from '../services/user.service';
 import { toast } from 'react-toastify';
 import UserDetails from "./UserDetails"
@@ -14,7 +14,7 @@ const DisplayUser = ({ refreshUsers }) => {
 
   console.log("isClick: ", isClick);
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       setIsLoading(true);
       const response = await getAllUser();
@@ -36,7 +36,9 @@ const DisplayUser = ({ refreshUsers }) => {
 
       const normalized = fetchedData.map(normalizeUser);
         setAllUsers(normalized);
-        toast.success(response?.message);
+        if(refreshUsers > 0) {
+          toast.success(response?.message || "Users list refreshed.");
+        }
       }
     } catch (error) {
       console.log("An Error Occurred at fetchUsers()", error);
@@ -44,7 +46,7 @@ const DisplayUser = ({ refreshUsers }) => {
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [refreshUsers])
 
   const handleUpdateUser = async (id, payload) => {
     const previousUser = allUsers;
@@ -119,7 +121,7 @@ const DisplayUser = ({ refreshUsers }) => {
 
   useEffect(() => {
     fetchUsers();
-  }, [refreshUsers]);
+  }, [fetchUsers]);
 
 
   if(isLoading) {

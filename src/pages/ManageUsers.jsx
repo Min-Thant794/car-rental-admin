@@ -6,9 +6,9 @@ const ManageUsers = () => {
 
   const[addUser, setAddUser] = useState(false);
   
-  const [refreshUsers, setRefreshUsers] = useState(false);
+  const [refreshUsers, setRefreshUsers] = useState(0);
 
-  const triggerRefreshUsers = () => setRefreshUsers(prev => !prev);
+  const triggerRefreshUsers = () => setRefreshUsers((prev) => prev + 1);
 
   const toggleAddUser = () => {
     setAddUser(true);
