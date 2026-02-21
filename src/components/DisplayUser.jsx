@@ -3,7 +3,7 @@ import {getAllUser, updateUserData, deleteUser} from '../services/user.service';
 import { toast } from 'react-toastify';
 import UserDetails from "./UserDetails"
 
-const DisplayUser = () => {
+const DisplayUser = ({ refreshUsers }) => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [allUsers, setAllUsers] = useState([]);
@@ -119,7 +119,7 @@ const DisplayUser = () => {
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [refreshUsers]);
 
 
   if(isLoading) {

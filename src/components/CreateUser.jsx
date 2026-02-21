@@ -4,7 +4,7 @@ import defaultImage from '../assets/default image.png'
 import {createUser} from '../services/user.service'
 import { toast } from 'react-toastify';
 
-const CreateUser = ({setAddUser}) => {
+const CreateUser = ({setAddUser, triggerRefreshUsers }) => {
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -116,6 +116,7 @@ const CreateUser = ({setAddUser}) => {
       }
 
       toast.success(response?.message || "A new user is successfully created!");
+      triggerRefreshUsers();
       setAddUser(false);
     } catch (error) {
       console.log("An Error Occurred at handleCreateUser()", error);

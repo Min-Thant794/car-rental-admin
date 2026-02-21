@@ -5,6 +5,10 @@ import CreateUser from '../components/CreateUser'
 const ManageUsers = () => {
 
   const[addUser, setAddUser] = useState(false);
+  
+  const [refreshUsers, setRefreshUsers] = useState(false);
+
+  const triggerRefreshUsers = () => setRefreshUsers(prev => !prev);
 
   const toggleAddUser = () => {
     setAddUser(true);
@@ -31,10 +35,11 @@ const ManageUsers = () => {
         className={`fixed shadow-md ${addUser ? "opacity-100 translate-y-1" : "opacity-0 -translate-y-1 pointer-events-none"} inset-0 flex items-center justify-center bg-black/10 z-30`}>
           <CreateUser
           setAddUser={setAddUser}
+          triggerRefreshUsers = {triggerRefreshUsers}
           />
         </div>
       }
-      <DisplayUser/>
+      <DisplayUser refreshUsers={refreshUsers}/>
     </div>
   )
 }
