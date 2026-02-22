@@ -3,6 +3,7 @@ import { IoClose } from 'react-icons/io5';
 import defaultImage from '../assets/default image.png'
 import {createUser} from '../services/user.service'
 import { toast } from 'react-toastify';
+import { FaEye, FaEyeSlash } from 'react-icons/fa'
 
 const CreateUser = ({setAddUser, triggerRefreshUsers }) => {
 
@@ -13,6 +14,12 @@ const CreateUser = ({setAddUser, triggerRefreshUsers }) => {
 
   const [uploadLicenseImg, setUploadLicenseImg] = useState(defaultImage);
   const [fileForLicenseImg, setFileForLicenseImg] = useState(null);
+
+  const [isShowPassword, setIsShowPassword] = useState(false);
+
+  const togglePassword = () => {
+    setIsShowPassword(!isShowPassword);
+  }
 
   const initialForm = useMemo(() => ({
     userName: "",
@@ -32,7 +39,7 @@ const CreateUser = ({setAddUser, triggerRefreshUsers }) => {
   const fields = [
     { name: 'userName', label: 'Enter username: ', type: 'text'},
     { name: 'email', label: 'Enter email: ', type: 'email'},
-    { name: 'password', label: 'Enter password: ', type: 'text'},
+    { name: 'password', label: 'Enter password: ', type: 'password'},
     { name: 'role', label: 'Role: ', type: 'text', options: ["Admin", "Customer"]},
     
     { name: 'phoneNumber', label: 'Phone Number: ', type: 'text', customerOnly: true},
@@ -73,8 +80,6 @@ const CreateUser = ({setAddUser, triggerRefreshUsers }) => {
     try {
       setIsLoading(true);
       const requiredField = form.role === "Customer" ? ["userName", "email", "password", "phoneNumber", "role", "dateOfBirth", "verificationStatus"] : ["userName", "email", "password", "role"]
-
-      //console.log("Submit form", form);
 
       const missingField = requiredField.filter((k) => {
         const v = form[k];
@@ -139,7 +144,7 @@ const CreateUser = ({setAddUser, triggerRefreshUsers }) => {
       profileInputRef.current.value = "";
     }
 
-    if(profileInputRef.current) {
+    if(licenseInputRef.current) {
       licenseInputRef.current.value = "";
     }
   }
@@ -253,12 +258,23 @@ const CreateUser = ({setAddUser, triggerRefreshUsers }) => {
                           </select>
                         </div>
                         :
-                        <input
-                        type={field.type}
-                        value={form[field.name] || ""}
-                        onChange={(e) => handleOnChange(field.name, e.target.value)}
-                        className='outline-none px-2 py-1'
-                        />
+                        <>
+                          <input
+                          type={field.name === 'password' ? (isShowPassword ? 'text' : 'password') : field.type}
+                          value={form[field.name] || ""}
+                          onChange={(e) => handleOnChange(field.name, e.target.value)}
+                          className='outline-none px-2 py-1 w-full'
+                          />
+                          {field.name === 'password' && (
+                              <button 
+                              type="button"
+                              onClick={togglePassword}
+                              className='pr-3 text-gray-600'
+                              >
+                              {isShowPassword ? <FaEye className='cursor-pointer active:opacity-65'/> : <FaEyeSlash className='cursor-pointer active:opacity-65'/>}
+                              </button>
+                          )}
+                        </>
                       }
                     </div>
                   </div>

@@ -180,7 +180,7 @@ const DisplayCars = ({refreshTrigger}) => {
                 const inputId = `fileupload-${car._id}`;
 
                 return (
-                    <div key={car._id} className='bg-[#a4a4a4] rounded-lg grid grid-cols-7 p-3 gap-3'>
+                    <div key={car._id} className='bg-[#a4a4a4] rounded-lg grid grid-cols-7 p-3 gap-3 mt-5'>
                         <div className='relative col-span-4'>
                             <img src={previewImgById[car._id] || car?.carImageUrl} className='w-full h-88 object-fit rounded-md' />
                             {
