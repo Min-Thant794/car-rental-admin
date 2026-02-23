@@ -21,6 +21,6 @@ export const API_ROUTES = {
 
     //bookings
     GET_ALL_BOOKINGS: "/bookings",
-    UPDATE_BOOKING: "/bookings/id",
-    DELETE_BOOKING: "/bookings/id"
+    UPDATE_BOOKING: "/bookings",
+    DELETE_BOOKING: "/bookings"
 }

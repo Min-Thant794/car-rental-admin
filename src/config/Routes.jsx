@@ -1,5 +1,4 @@
 import { FaBook, FaCar, FaHome, FaUser } from "react-icons/fa"
-import { IoIosSettings } from "react-icons/io"
 import { Navigate } from "react-router-dom"
 import MainLayout from "../layout/MainLayout"
 import Login from "../pages/Login"
