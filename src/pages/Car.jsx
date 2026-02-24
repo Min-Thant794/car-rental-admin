@@ -28,12 +28,12 @@ const Car = () => {
   const fields = [
     { name: "carName", label: "Car Name", type: "text", placeholder: "Enter Car Name"},
     { name: "description", label: "Description", type: "text", placeholder: "Enter Description"},
-    { name: "fuelType", label: "Fuel Type", type: "text", placeholder: "Choose Fuel Type"},
-    { name: "vehicleType", label: "Vehicle Type", type: "text", placeholder: "Choose Vehicle Type"},
-    { name: "pricePerDay", label: "Price Per Day", type: "text", placeholder: "Enter Price Per Day"},
+    { name: "fuelType", label: "Fuel Type", type: "text", placeholder: "Choose Fuel Type", options: ["Diesel", "Electric", "Petrol"]},
+    { name: "vehicleType", label: "Vehicle Type", type: "text", placeholder: "Choose Vehicle Type", options: ["Crossover", "Sedan", "SUV", "MPV", "Hatchback", "Station Wagon"]},
+    { name: "pricePerDay", label: "Price Per Day", type: "text", placeholder: "Enter Price Per Day", options: ["0", "10", "15", "20", "25", "30", "35", "40", "45", "50"]},
     { name: "discount", label: "Discount", type: "text", placeholder: "Select Discount"},
     { name: "carBrand", label: "Car Brand", type: "text", placeholder: "Enter Car Brand"},
-    { name: "availabilityStatus", label: "Availability Status", type: "text", placeholder: "Choose Availability Status"},
+    { name: "availabilityStatus", label: "Availability Status", type: "text", placeholder: "Choose Availability Status", options: ["Available", "Unavailable", "Maintenance"]},
   ]
 
   const toggleAddCar = () => {

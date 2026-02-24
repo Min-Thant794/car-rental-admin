@@ -9,7 +9,7 @@ const DisplayCars = ({refreshTrigger}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [editableCars, setEditableCars] = useState({});
   const [actionLoadingById, setActionLoadingById] = useState({});
-  const [isEdit, setIsEdit] = useState(false);
+  const [editingCarId, setEditingCarId] = useState(null);
   const [previewImgById, setPreviewImgById] = useState({});
   const [fileById, setFileById] = useState({});
 
@@ -112,8 +112,8 @@ const DisplayCars = ({refreshTrigger}) => {
             const n = {...prev}; delete n[id]; return n;
         })
 
+        setEditingCarId(null);
         toast.success(response?.message || "Car updated successfully!");
-        setIsEdit(false);
     } catch (error) {
         console.log("An Error Occurred at handleUpdate()", error);
         toast.error("Unable to update car");
@@ -155,7 +155,7 @@ const DisplayCars = ({refreshTrigger}) => {
         ...prev,
         [carId]: { ...originalCar }
     }));
-    setIsEdit(false);
+    setEditingCarId(null);
   };
 
   if(isLoading) {
@@ -177,6 +177,7 @@ const DisplayCars = ({refreshTrigger}) => {
         </div>
         {
             allCars.map((car) => {
+                const isEdit = editingCarId === car._id;
                 const editable = editableCars[car._id] || {}
                 const discount = Number(editable.discount ?? car.discount ?? 0);
                 const pricePerDay = Number(editable.pricePerDay ?? car.pricePerDay ?? 0);
@@ -216,9 +217,9 @@ const DisplayCars = ({refreshTrigger}) => {
                                 {label: 'Car Name', key: "carName"},
                                 {label: 'Description', key: "description"},
                                 {label: 'Fuel Type', key: "fuelType", options: ["Diesel", "Electric", "Petrol"]},
-                                {label: 'Vehicle Type', key: "vehicleType"},
+                                {label: 'Vehicle Type', key: "vehicleType", options: ["Crossover", "Sedan", "SUV", "MPV", "Hatchback", "Station Wagon"]},
                                 {label: 'Price Per Day (SGD)', key: "pricePerDay"},
-                                {label: 'Discount %', key: "discount"},
+                                {label: 'Discount %', key: "discount", options: ["0", "10", "15", "20", "25", "30", "35", "40", "45", "50"]},
                                 {label: 'Car Brand', key: "brand"},
                                 {label: 'Availability Status', key: "availabilityStatus", options: ["Available", "Unavailable", "Maintenance"]},
                             ].map((field) => (
@@ -235,7 +236,7 @@ const DisplayCars = ({refreshTrigger}) => {
                                             <select
                                             value={editable[field.key] || ''}
                                             onChange={(e) => handleChange(car._id, field.key, e.target.value)}
-                                            className='w-4/7 font-semibold px-2 py-1 rounded-md outline-none bg-amber-50'
+                                            className='w-4/7 font-semibold px-2 py-1 cursor-pointer rounded-md outline-none bg-amber-50'
                                             >
                                                 {field.options.map((option) => (
                                                     <option key={option} value={option}>
@@ -292,7 +293,7 @@ const DisplayCars = ({refreshTrigger}) => {
                                 <div 
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    setIsEdit(true);
+                                    setEditingCarId(car._id);
                                 }}
                                 className={`absolute bottom-0 right-22 ${isEdit && "opacity-0 pointer-events-none"} transition duration-300 px-3 py-2 bg-[#434343] w-2/13 cursor-pointer active:opacity-65 hover:opacity-80 rounded-lg text-center font-bold tracking-wide text-amber-50`}>
                                     Edit
@@ -303,7 +304,7 @@ const DisplayCars = ({refreshTrigger}) => {
                                         <button
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            setIsEdit(false);
+                                            setEditingCarId(null);
                                             handleCancelUpdate(car._id);
                                         }}
                                         className='absolute right-45 transition duration-300 px-3 py-2 bg-[#434343] text-amber-50 font-bold tracking-wide text-center cursor-pointer active:opacity-65 hover:opacity-80 rounded-lg disabled:opacity-50'
