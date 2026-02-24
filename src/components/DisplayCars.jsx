@@ -30,6 +30,7 @@ const DisplayCars = ({refreshTrigger}) => {
                     fuelType: car?.fuelType || '',
                     vehicleType: car?.vehicleType || '',
                     pricePerDay: car?.pricePerDay || '',
+                    discount: car?.discount || '',
                     brand: car?.brand || '',
                     availabilityStatus: car?.availabilityStatus || ''
                 }
@@ -81,6 +82,7 @@ const DisplayCars = ({refreshTrigger}) => {
         fd.append("fuelType", editableCar.fuelType);
         fd.append("vehicleType", editableCar.vehicleType);
         fd.append("pricePerDay", editableCar.pricePerDay);
+        fd.append("discount", editableCar.discount);
         fd.append("brand", editableCar.brand);
         fd.append("availabilityStatus", editableCar.availabilityStatus);
 
@@ -176,6 +178,13 @@ const DisplayCars = ({refreshTrigger}) => {
         {
             allCars.map((car) => {
                 const editable = editableCars[car._id] || {}
+                const discount = Number(editable.discount ?? car.discount ?? 0);
+                const pricePerDay = Number(editable.pricePerDay ?? car.pricePerDay ?? 0);
+
+                const discountedPrice = discount > 0 
+                ? (pricePerDay - (pricePerDay * discount) / 100).toFixed(2)
+                : null;
+
                 const isActionLoading = actionLoadingById[car._id]
                 const inputId = `fileupload-${car._id}`;
 
@@ -209,6 +218,7 @@ const DisplayCars = ({refreshTrigger}) => {
                                 {label: 'Fuel Type', key: "fuelType", options: ["Diesel", "Electric", "Petrol"]},
                                 {label: 'Vehicle Type', key: "vehicleType"},
                                 {label: 'Price Per Day (SGD)', key: "pricePerDay"},
+                                {label: 'Discount %', key: "discount"},
                                 {label: 'Car Brand', key: "brand"},
                                 {label: 'Availability Status', key: "availabilityStatus", options: ["Available", "Unavailable", "Maintenance"]},
                             ].map((field) => (
@@ -255,6 +265,21 @@ const DisplayCars = ({refreshTrigger}) => {
                                     )}
                                 </div>
                             ))}
+
+                            {
+                                discountedPrice && (
+                                    <div className='flex gap-2 items-center'>
+                                        <div className='w-3/7 font-bold tracking-wide'>
+                                            Discounted Price
+                                        </div>
+                                        <input type="text"
+                                        value={discountedPrice}
+                                        readOnly
+                                        className='w-4/7 font-semibold px-2 py-1 rounded-md outline-none bg-amber-50'
+                                        />
+                                    </div>
+                                )
+                            }
 
                             <div className='relative w-full flex gap-3 justify-end'>
                                 <button

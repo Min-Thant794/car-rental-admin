@@ -31,6 +31,7 @@ const Car = () => {
     { name: "fuelType", label: "Fuel Type", type: "text", placeholder: "Choose Fuel Type"},
     { name: "vehicleType", label: "Vehicle Type", type: "text", placeholder: "Choose Vehicle Type"},
     { name: "pricePerDay", label: "Price Per Day", type: "text", placeholder: "Enter Price Per Day"},
+    { name: "discount", label: "Discount", type: "text", placeholder: "Select Discount"},
     { name: "carBrand", label: "Car Brand", type: "text", placeholder: "Enter Car Brand"},
     { name: "availabilityStatus", label: "Availability Status", type: "text", placeholder: "Choose Availability Status"},
   ]
