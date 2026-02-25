@@ -17,6 +17,7 @@ const Car = () => {
     fuelType: "",
     vehicleType: "",
     pricePerDay: "",
+    discount: "",
     carBrand: "",
     availabilityStatus: "",
   }), []);
@@ -26,15 +27,25 @@ const Car = () => {
   const [file, setFile] = useState(null);
 
   const fields = [
-    { name: "carName", label: "Car Name", type: "text", placeholder: "Enter Car Name"},
-    { name: "description", label: "Description", type: "text", placeholder: "Enter Description"},
-    { name: "fuelType", label: "Fuel Type", type: "text", placeholder: "Choose Fuel Type", options: ["Diesel", "Electric", "Petrol"]},
-    { name: "vehicleType", label: "Vehicle Type", type: "text", placeholder: "Choose Vehicle Type", options: ["Crossover", "Sedan", "SUV", "MPV", "Hatchback", "Station Wagon"]},
-    { name: "pricePerDay", label: "Price Per Day", type: "text", placeholder: "Enter Price Per Day", options: ["0", "10", "15", "20", "25", "30", "35", "40", "45", "50"]},
-    { name: "discount", label: "Discount", type: "text", placeholder: "Select Discount"},
-    { name: "carBrand", label: "Car Brand", type: "text", placeholder: "Enter Car Brand"},
-    { name: "availabilityStatus", label: "Availability Status", type: "text", placeholder: "Choose Availability Status", options: ["Available", "Unavailable", "Maintenance"]},
-  ]
+    { name: "carName", label: "Car Name", type: "text", placeholder: "Enter Car Name" },
+    { name: "description", label: "Description", type: "text", placeholder: "Enter Description" },
+
+    { name: "fuelType", label: "Fuel Type", type: "select", placeholder: "Choose Fuel Type",
+      options: ["Diesel", "Electric", "Petrol"] },
+
+    { name: "vehicleType", label: "Vehicle Type", type: "select", placeholder: "Choose Vehicle Type",
+      options: ["Crossover", "Sedan", "SUV", "MPV", "Hatchback", "Station Wagon"] },
+
+    { name: "pricePerDay", label: "Price Per Day", type: "text", placeholder: "Enter Price Per Day" },
+
+    { name: "discount", label: "Discount", type: "select", placeholder: "Select Discount",
+      options: ["0", "10", "15", "20", "25", "30", "35", "40", "45", "50"] },
+
+    { name: "carBrand", label: "Car Brand", type: "text", placeholder: "Enter Car Brand" },
+
+    { name: "availabilityStatus", label: "Availability Status", type: "select", placeholder: "Choose Availability Status",
+      options: ["Available", "Unavailable", "Maintenance"] },
+  ];
 
   const toggleAddCar = () => {
     setAddCar(!addCar);
@@ -96,6 +107,7 @@ const Car = () => {
       fd.append("fuelType", form.fuelType);
       fd.append("vehicleType", form.vehicleType);
       fd.append("pricePerDay", form.pricePerDay);
+      fd.append("discount", form.discount || "0");
       fd.append("brand", form.carBrand);
       fd.append("availabilityStatus", form.availabilityStatus);
 
@@ -182,15 +194,39 @@ const Car = () => {
                       <label className='font-semibold text-amber-50 w-4/10'>
                         {f.label}
                       </label>
-                      <input 
-                      name={f.name}
-                      type={f.type}
-                      placeholder={f.placeholder}
-                      value={form[f.name]}
-                      onChange={handleChange}
-                      disabled={isLoading}
-                      className='py-1 outline-none border-none w-6/10 placeholder:font-semibold placeholder:text-sm rounded-lg px-2 bg-[#a4a4a4] disabled:opacity-50'
-                      />
+                      {
+                        f.type === "select" ? (
+                          <select
+                            name={f.name}
+                            value={form[f.name] ?? ""}
+                            onChange={handleChange}
+                            disabled={isLoading}
+                            className="py-1 outline-none border-none w-6/10 rounded-lg px-2 bg-[#a4a4a4] disabled:opacity-50"
+                          >
+                            <option value="" disabled>
+                              {f.placeholder}
+                            </option>
+
+                            {f.options?.map((opt) => (
+                              <option className="text-black" key={opt} value={opt}>
+                                {opt}
+                              </option>
+                            ))}
+                          </select>
+                        )
+                        :
+                        (
+                          <input
+                          name={f.name}
+                          type={f.type}
+                          placeholder={f.placeholder}
+                          value={form[f.name]}
+                          onChange={handleChange}
+                          disabled={isLoading}
+                          className='py-1 outline-none border-none w-6/10 placeholder:font-semibold placeholder:text-sm rounded-lg px-2 bg-[#a4a4a4] disabled:opacity-50'
+                          />
+                        )
+                      }
                     </div>
                   ))
                 }
