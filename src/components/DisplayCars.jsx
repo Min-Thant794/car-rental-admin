@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { getAllCar, updateCar, deleteCar } from '../services/car.service'
 import { toast } from 'react-toastify';
 import CarSkeletonLoading from './CarSkeletonLoading';
+import { FaGreaterThan, FaLessThan } from "react-icons/fa6";
 
 const DisplayCars = ({refreshTrigger}) => {
 
@@ -13,13 +14,20 @@ const DisplayCars = ({refreshTrigger}) => {
   const [previewImgById, setPreviewImgById] = useState({});
   const [fileById, setFileById] = useState({});
 
+  const itemsPerPage = 10;
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCars, setTotalCars] = useState(0);
+
   const fetchAllCars = async () => {
     try {
         setIsLoading(true);
-        const response = await getAllCar();
+        const response = await getAllCar(currentPage, itemsPerPage);
 
         if(response?.success) {
             const fetchedCars = response?.data || [];
+            setTotalPages(response?.pagination?.totalPages || 1);
+            setTotalCars(response?.pagination?.total || 0);
             //toast.success(response?.message);
             setAllCars(fetchedCars);
 
@@ -29,6 +37,7 @@ const DisplayCars = ({refreshTrigger}) => {
                     description: car?.description || '',
                     fuelType: car?.fuelType || '',
                     vehicleType: car?.vehicleType || '',
+                    seater: car?.seater || '',
                     pricePerDay: car?.pricePerDay || '',
                     discount: car?.discount || '',
                     brand: car?.brand || '',
@@ -49,7 +58,7 @@ const DisplayCars = ({refreshTrigger}) => {
 
   useEffect(() => {
     fetchAllCars();
-  }, [refreshTrigger]);
+  }, [refreshTrigger, currentPage]);
 
   const handleChange = (id, field, value) => {
     setEditableCars((prev) => ({
@@ -81,6 +90,7 @@ const DisplayCars = ({refreshTrigger}) => {
         fd.append("description", editableCar.description);
         fd.append("fuelType", editableCar.fuelType);
         fd.append("vehicleType", editableCar.vehicleType);
+        fd.append("seater", editableCar.seater);
         fd.append("pricePerDay", editableCar.pricePerDay);
         fd.append("discount", editableCar.discount);
         fd.append("brand", editableCar.brand);
@@ -132,7 +142,18 @@ const DisplayCars = ({refreshTrigger}) => {
             return
         }
 
-        setAllCars((prev) => prev.filter((car) => car._id !== id));
+        setAllCars((prev) => {
+            const next = prev.filter((car) => car._id !== id);
+
+            if(next.length === 0 && currentPage > 1) {
+                setCurrentPage((p) => p -1);
+            } else {
+                fetchAllCars();
+            }
+
+            return next;
+        });
+
         setEditableCars((prev) => {
             const next = {...prev}
             delete next[id]
@@ -171,8 +192,8 @@ const DisplayCars = ({refreshTrigger}) => {
     <div className='w-full gap-3 py-3'>
         <div className='w-full font-semibold tracking-wide text-center pb-2'>
             Total&nbsp;
-            {allCars.length}
-            {allCars.length > 1 ? " cars " : " car "}
+            {totalCars}
+            {totalCars > 1 ? " cars " : " car "}
             available in this platform.
         </div>
         {
@@ -192,7 +213,7 @@ const DisplayCars = ({refreshTrigger}) => {
                 return (
                     <div key={car._id} className='bg-[#a4a4a4] rounded-lg grid grid-cols-7 p-3 gap-3 mt-5'>
                         <div className='relative col-span-4'>
-                            <img src={previewImgById[car._id] || car?.carImageUrl} className='w-full h-88 object-fit rounded-md' />
+                            <img src={previewImgById[car._id] || car?.carImageUrl} className='w-full h-full object-fit rounded-md' />
                             {
                                 isEdit &&
                                 <div>
@@ -218,6 +239,7 @@ const DisplayCars = ({refreshTrigger}) => {
                                 {label: 'Description', key: "description"},
                                 {label: 'Fuel Type', key: "fuelType", options: ["Diesel", "Electric", "Petrol"]},
                                 {label: 'Vehicle Type', key: "vehicleType", options: ["Crossover", "Sedan", "SUV", "MPV", "Hatchback", "Station Wagon"]},
+                                {label: 'Seater', key: "seater", options: ["4", "5", "6", "7"]},
                                 {label: 'Price Per Day (SGD)', key: "pricePerDay"},
                                 {label: 'Discount %', key: "discount", options: ["0", "10", "15", "20", "25", "30", "35", "40", "45", "50"]},
                                 {label: 'Car Brand', key: "brand"},
@@ -236,7 +258,7 @@ const DisplayCars = ({refreshTrigger}) => {
                                             <select
                                             value={editable[field.key] || ''}
                                             onChange={(e) => handleChange(car._id, field.key, e.target.value)}
-                                            className='w-4/7 font-semibold px-2 py-1 cursor-pointer rounded-md outline-none bg-amber-50'
+                                            className='w-4/7 font-semibold px-2 py-1 cursor-pointer rounded-md outline-none bg-[#eaeaea]'
                                             >
                                                 {field.options.map((option) => (
                                                     <option key={option} value={option}>
@@ -251,7 +273,7 @@ const DisplayCars = ({refreshTrigger}) => {
                                             type='text'
                                             value={editable[field.key] || ''}
                                             readOnly={true}
-                                            className='w-4/7 font-semibold px-2 py-1 rounded-md outline-none bg-amber-50'
+                                            className='w-4/7 font-semibold px-2 py-1 rounded-md outline-none bg-[#eaeaea]'
                                             />
                                         )
                                     ) : 
@@ -261,7 +283,7 @@ const DisplayCars = ({refreshTrigger}) => {
                                         value={editable[field.key] || ''}
                                         readOnly={!isEdit}
                                         onChange={(e => handleChange(car._id, field.key, e.target.value))}
-                                        className='w-4/7 font-semibold px-2 py-1 rounded-md outline-none bg-amber-50'
+                                        className='w-4/7 font-semibold px-2 py-1 rounded-md outline-none bg-[#eaeaea]'
                                         />
                                     )}
                                 </div>
@@ -276,7 +298,7 @@ const DisplayCars = ({refreshTrigger}) => {
                                         <input type="text"
                                         value={discountedPrice}
                                         readOnly
-                                        className='w-4/7 font-semibold px-2 py-1 rounded-md outline-none bg-amber-50'
+                                        className='w-4/7 font-semibold px-2 py-1 rounded-md outline-none bg-[#eaeaea]'
                                         />
                                     </div>
                                 )
@@ -326,6 +348,36 @@ const DisplayCars = ({refreshTrigger}) => {
                 )
             })
         }
+        <div className='flex justify-center items-center py-10 w-full'>
+            <div className='flex justify-center items-center gap-2 w-1/2 text-center'>
+                <button 
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1 ))}
+                className='flex justify-center items-center gap-2 cursor-pointer disabled:cursor-not-allowed border-2 px-3 active:opacity-65 py-2 border-[#434343] rounded-lg shadow-xl'>
+                    <FaLessThan/>
+                    Prev
+                </button>
+                <div className='flex gap-2'>
+                    {
+                        Array.from({length: totalPages}, (_, i) => 
+                        <button 
+                        key={i}
+                        onClick={() => setCurrentPage(i + 1)}
+                        className={`${currentPage === i + 1 ? 'bg-[#434343] text-amber-50 px-3 py-2 rounded-lg font-semibold border-2 border-[#434343] cursor-pointer active:opacity-65 hover:opacity-90 shadow-xl' : 'px-3 py-2 rounded-lg font-semibold border-2 border-[#434343] cursor-pointer active:opacity-65 hover:opacity-90 shadow-xl'}`}>
+                            {i + 1}
+                        </button>
+                        ) 
+                    }
+                </div>
+                <button
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1 ))}
+                className='flex justify-center items-center gap-2 cursor-pointer border-2 disabled:cursor-not-allowed active:opacity-65 border-[#434343] rounded-lg px-3 py-2 shadow-xl'>
+                    Next
+                    <FaGreaterThan />
+                </button>
+            </div>
+        </div>
     </div>
   )
 }

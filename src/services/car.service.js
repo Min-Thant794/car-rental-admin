@@ -16,9 +16,11 @@ export const createCar = async (payload) => {
     }
 }
 
-export const getAllCar = async () => {
+export const getAllCar = async (page = 1, limit = 10) => {
     try {
-        const response = await axiosInstance.get(API_ROUTES.GET_ALL_CARS);
+        const response = await axiosInstance.get(API_ROUTES.GET_ALL_CARS, {
+            params: { page, limit }
+        });
         console.log("Response all car: ", response.data);
         return response.data;
     } catch (error) {

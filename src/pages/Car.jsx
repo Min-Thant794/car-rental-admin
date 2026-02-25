@@ -16,6 +16,7 @@ const Car = () => {
     description: "",
     fuelType: "",
     vehicleType: "",
+    seater: "",
     pricePerDay: "",
     discount: "",
     carBrand: "",
@@ -35,6 +36,9 @@ const Car = () => {
 
     { name: "vehicleType", label: "Vehicle Type", type: "select", placeholder: "Choose Vehicle Type",
       options: ["Crossover", "Sedan", "SUV", "MPV", "Hatchback", "Station Wagon"] },
+
+    { name: "seater", label: "Seater", type: "select", placeholder: "Select Seater",
+      options: ["4", "5", "6", "7"] },
 
     { name: "pricePerDay", label: "Price Per Day", type: "text", placeholder: "Enter Price Per Day" },
 
@@ -96,7 +100,7 @@ const Car = () => {
     setIsLoading(true);
 
     try {
-      if(!form.carName || !form.description || !form.carBrand || !form.availabilityStatus || !form.fuelType || !form.pricePerDay || !form.vehicleType) {
+      if(!form.carName || !form.description || !form.carBrand || !form.availabilityStatus || !form.fuelType || !form.pricePerDay || !form.vehicleType || !form.seater) {
         toast.error("Please fill all required fields");
         return;
       }
@@ -106,6 +110,7 @@ const Car = () => {
       fd.append("description", form.description);
       fd.append("fuelType", form.fuelType);
       fd.append("vehicleType", form.vehicleType);
+      fd.append("seater", form.seater);
       fd.append("pricePerDay", form.pricePerDay);
       fd.append("discount", form.discount || "0");
       fd.append("brand", form.carBrand);
@@ -156,15 +161,17 @@ const Car = () => {
           }
         }}
         className='fixed shadow-md inset-0 flex items-center justify-center bg-black/10 z-30'>
-          <form 
+          <form
           onSubmit={handleSubmit}
           onClick={(e) => {
             e.stopPropagation();
           }}
-          className='w-5/10 grid grid-cols-7 bg-[#434343] rounded-lg px-5 py-2'>
-            <div className='relative col-span-3 h-8/10 mt-5'>
+          className='w-6/10 flex bg-[#434343] shadow-xl rounded-lg px-5 py-2'>
+            <div className='relative flex items-center w-1/2 h-full mt-5'>
               {/* preview image */}
-              <img src={previewImg} className='object-cover w-full h-full rounded-lg bg-[#a4a4a4]' />
+              <div className='w-full h-full'>
+                <img src={previewImg} className='object-cover w-full shadow-xl h-110 rounded-lg bg-[#a4a4a4]' />
+              </div>
               {
                 addCar &&
                 <div
@@ -186,7 +193,7 @@ const Car = () => {
                 disabled={isLoading}
                 />
             </div>
-            <div className='col-span-4'>
+            <div className='w-1/2'>
               <div className='flex flex-col gap-3 px-3 mt-3 justify-center'>
                 {
                   fields.map((f) => (
@@ -201,7 +208,7 @@ const Car = () => {
                             value={form[f.name] ?? ""}
                             onChange={handleChange}
                             disabled={isLoading}
-                            className="py-1 outline-none border-none w-6/10 rounded-lg px-2 bg-[#a4a4a4] disabled:opacity-50"
+                            className="py-1 outline-none border-none w-6/10 rounded-lg cursor-pointer px-2 bg-[#a4a4a4] disabled:opacity-50"
                           >
                             <option value="" disabled>
                               {f.placeholder}
@@ -231,7 +238,7 @@ const Car = () => {
                   ))
                 }
               </div>
-              <div className='flex w-full gap-3 justify-end px-3 pt-5'>
+              <div className='flex w-full gap-3 justify-end px-3 pb-3 pt-5'>
                 <button 
                 type='button'
                 onClick={handleCancel}
