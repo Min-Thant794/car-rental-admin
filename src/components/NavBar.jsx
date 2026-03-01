@@ -23,7 +23,7 @@ const NavBar = () => {
               return <NavLink
               key={child?.name}
               to={child?.path}
-              className={({isActive}) => `${isActive ? "bg-[#434343] text-amber-50" : "bg-[#d6d6d6]"} btn-border-reveal transition duration-300 flex items-center shadow-md gap-3 font-bold mx-4 px-2 py-2 rounded-lg hover:opacity-85 cursor-pointer`}>
+              className={({isActive}) => `${isActive ? "bg-[#434343] text-amber-50" : "bg-[#d6d6d6]"} btn-border-reveal transition duration-300 flex items-center shadow-gray-700 shadow-[0_10px_20px_-5px_rgba(0,0,0,0.3)] gap-3 font-bold mx-4 px-2 py-2 rounded-lg hover:opacity-85 cursor-pointer`}>
                 <div
                 className='text-xl'>
                   {child?.icon}
@@ -41,7 +41,7 @@ const NavBar = () => {
         e.preventDefault();
         logout();
       }}
-      className='transition duration-300 btn-border-reveal font-bold tracking-wide px-3 py-2 bg-[#393939] shadow-md text-amber-50 rounded-lg my-5 mx-4 active:opacity-65 hover:opacity-85 cursor-pointer'>
+      className='transition duration-300 btn-border-reveal shadow-gray-700 shadow-[0_10px_20px_-5px_rgba(0,0,0,0.3)] font-bold tracking-wide px-3 py-2 bg-[#393939] text-amber-50 rounded-lg my-5 mx-4 active:opacity-65 hover:opacity-85 cursor-pointer'>
         Log out
       </div>
       </div>

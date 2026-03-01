@@ -21,7 +21,7 @@ const ManageUsers = () => {
         e.stopPropagation();
         toggleAddUser();
       }}
-      className='btn-border-reveal bg-[#a4a4a4] transition duration-300 px-3 shadow-md py-2 w-1/13 font-bold select-none tracking-wide text-center rounded-lg active:opacity-65 hover:opacity-85 cursor-pointer'>
+      className='btn-border-reveal bg-[#a4a4a4] transition duration-300 px-3 shadow-gray-700 shadow-[0_10px_20px_-5px_rgba(0,0,0,0.3)] py-2 w-1/13 font-bold select-none tracking-wide text-center rounded-lg active:opacity-65 hover:opacity-85 cursor-pointer'>
         Add User
       </div>
 

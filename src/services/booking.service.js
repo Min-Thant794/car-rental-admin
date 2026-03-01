@@ -4,6 +4,11 @@ import { API_ROUTES } from "../config/config";
 export const getAllBooking = async () => {
     try {
         const response = await axiosInstance.get(API_ROUTES.GET_ALL_BOOKINGS);
+
+        if(!response?.data) {
+            console("Nothing Fetched");
+            return;
+        }
         console.log("getAllBooking() reponse: ", response);
         return response.data;
     } catch (error) {

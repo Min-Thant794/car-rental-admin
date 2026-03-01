@@ -211,15 +211,15 @@ const DisplayCars = ({refreshTrigger}) => {
                 const inputId = `fileupload-${car._id}`;
 
                 return (
-                    <div key={car._id} className='bg-[#a4a4a4] rounded-lg grid grid-cols-7 p-3 gap-3 mt-5'>
+                    <div key={car._id} className='bg-[#a4a4a4] shadow-gray-700 shadow-[0_10px_20px_-5px_rgba(0,0,0,0.3)] rounded-lg grid grid-cols-7 p-3 gap-3 mt-5'>
                         <div className='relative col-span-4'>
-                            <img src={previewImgById[car._id] || car?.carImageUrl} className='w-full h-full object-fit rounded-md' />
+                            <img src={previewImgById[car._id] || car?.carImageUrl} className='w-full h-full object-fit rounded-md shadow-gray-700 shadow-[0_10px_20px_-5px_rgba(0,0,0,0.3)]' />
                             {
                                 isEdit &&
                                 <div>
                                     <div 
                                     onClick={() => document.getElementById(inputId)?.click()}
-                                    className='absolute px-3 py-2 right-2 bottom-2 font-semibold rounded-lg text-amber-50 bg-[#434343] active:opacity-65 hover:opacity-90 cursor-pointer'>
+                                    className='absolute px-3 py-2 right-2 bottom-2 shadow-gray-700 shadow-[0_10px_20px_-5px_rgba(0,0,0,0.3)] font-semibold rounded-lg text-amber-50 bg-[#434343] active:opacity-65 hover:opacity-90 cursor-pointer'>
                                         Upload
                                     </div>
                                     <input 
@@ -258,7 +258,7 @@ const DisplayCars = ({refreshTrigger}) => {
                                             <select
                                             value={editable[field.key] || ''}
                                             onChange={(e) => handleChange(car._id, field.key, e.target.value)}
-                                            className='w-4/7 font-semibold px-2 py-1 cursor-pointer rounded-md outline-none bg-[#eaeaea]'
+                                            className='w-4/7 font-semibold px-2 py-1 cursor-pointer rounded-md shadow-2xl outline-none bg-[#eaeaea]'
                                             >
                                                 {field.options.map((option) => (
                                                     <option key={option} value={option}>
@@ -273,7 +273,7 @@ const DisplayCars = ({refreshTrigger}) => {
                                             type='text'
                                             value={editable[field.key] || ''}
                                             readOnly={true}
-                                            className='w-4/7 font-semibold px-2 py-1 rounded-md outline-none bg-[#eaeaea]'
+                                            className='w-4/7 font-semibold px-2 py-1 rounded-md shadow-2xl outline-none bg-[#eaeaea]'
                                             />
                                         )
                                     ) : 
@@ -283,7 +283,7 @@ const DisplayCars = ({refreshTrigger}) => {
                                         value={editable[field.key] || ''}
                                         readOnly={!isEdit}
                                         onChange={(e => handleChange(car._id, field.key, e.target.value))}
-                                        className='w-4/7 font-semibold px-2 py-1 rounded-md outline-none bg-[#eaeaea]'
+                                        className='w-4/7 font-semibold px-2 py-1 rounded-md shadow-2xl outline-none bg-[#eaeaea]'
                                         />
                                     )}
                                 </div>
@@ -298,7 +298,7 @@ const DisplayCars = ({refreshTrigger}) => {
                                         <input type="text"
                                         value={discountedPrice}
                                         readOnly
-                                        className='w-4/7 font-semibold px-2 py-1 rounded-md outline-none bg-[#eaeaea]'
+                                        className='w-4/7 font-semibold px-2 py-1 rounded-md shadow-2xl outline-none bg-[#eaeaea]'
                                         />
                                     </div>
                                 )
@@ -308,7 +308,7 @@ const DisplayCars = ({refreshTrigger}) => {
                                 <button
                                 onClick={() => handleDelete(car._id)}
                                 disabled={isActionLoading}
-                                className='transition duration-300 px-3 py-2 bg-[#ff0000] text-amber-50 font-bold tracking-wide text-center cursor-pointer active:opacity-65 hover:opacity-80 rounded-lg disabled:opacity-50'
+                                className='transition duration-300 px-3 py-2 bg-[#ff0000] shadow-gray-700 shadow-[0_10px_20px_-5px_rgba(0,0,0,0.3)] text-amber-50 font-bold tracking-wide text-center cursor-pointer active:opacity-65 hover:opacity-80 rounded-lg disabled:opacity-50'
                                 >
                                     Delete
                                 </button>
@@ -317,7 +317,7 @@ const DisplayCars = ({refreshTrigger}) => {
                                     e.stopPropagation();
                                     setEditingCarId(car._id);
                                 }}
-                                className={`absolute bottom-0 right-22 ${isEdit && "opacity-0 pointer-events-none"} transition duration-300 px-3 py-2 bg-[#434343] w-2/13 cursor-pointer active:opacity-65 hover:opacity-80 rounded-lg text-center font-bold tracking-wide text-amber-50`}>
+                                className={`absolute bottom-0 right-22 ${isEdit && "opacity-0 pointer-events-none"} transition duration-300 px-3 py-2 bg-[#434343] w-2/13 cursor-pointer active:opacity-65 shadow-gray-700 shadow-[0_10px_20px_-5px_rgba(0,0,0,0.3)] hover:opacity-80 rounded-lg text-center font-bold tracking-wide text-amber-50`}>
                                     Edit
                                 </div>
                                 {
@@ -329,14 +329,14 @@ const DisplayCars = ({refreshTrigger}) => {
                                             setEditingCarId(null);
                                             handleCancelUpdate(car._id);
                                         }}
-                                        className='absolute right-45 transition duration-300 px-3 py-2 bg-[#434343] text-amber-50 font-bold tracking-wide text-center cursor-pointer active:opacity-65 hover:opacity-80 rounded-lg disabled:opacity-50'
+                                        className='absolute right-45 transition duration-300 px-3 py-2 bg-[#434343] text-amber-50 font-bold tracking-wide text-center cursor-pointer shadow-gray-700 shadow-[0_10px_20px_-5px_rgba(0,0,0,0.3)] active:opacity-65 hover:opacity-80 rounded-lg disabled:opacity-50'
                                         >
                                             Cancel
                                         </button>
                                         <button
                                         onClick={() => handleUpdate(car._id)}
                                         disabled={isActionLoading}
-                                        className='transition duration-300 px-3 py-2 bg-[#434343] text-amber-50 font-bold tracking-wide text-center cursor-pointer active:opacity-65 hover:opacity-80 rounded-lg disabled:opacity-50'
+                                        className='transition duration-300 px-3 py-2 bg-[#434343] text-amber-50 font-bold tracking-wide text-center cursor-pointer active:opacity-65 shadow-gray-700 shadow-[0_10px_20px_-5px_rgba(0,0,0,0.3)] hover:opacity-80 rounded-lg disabled:opacity-50'
                                         >
                                             Update
                                         </button>
@@ -353,7 +353,7 @@ const DisplayCars = ({refreshTrigger}) => {
                 <button 
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage(p => Math.max(1, p - 1 ))}
-                className='flex justify-center items-center gap-2 cursor-pointer disabled:cursor-not-allowed border-2 px-3 active:opacity-65 py-2 border-[#434343] rounded-lg shadow-xl'>
+                className='flex justify-center items-center gap-2 shadow-gray-700 shadow-[0_10px_20px_-5px_rgba(0,0,0,0.3)] cursor-pointer disabled:cursor-not-allowed border-2 px-3 active:opacity-65 py-2 border-[#434343] rounded-lg'>
                     <FaLessThan/>
                     Prev
                 </button>
@@ -363,7 +363,7 @@ const DisplayCars = ({refreshTrigger}) => {
                         <button 
                         key={i}
                         onClick={() => setCurrentPage(i + 1)}
-                        className={`${currentPage === i + 1 ? 'bg-[#434343] text-amber-50 px-3 py-2 rounded-lg font-semibold border-2 border-[#434343] cursor-pointer active:opacity-65 hover:opacity-90 shadow-xl' : 'px-3 py-2 rounded-lg font-semibold border-2 border-[#434343] cursor-pointer active:opacity-65 hover:opacity-90 shadow-xl'}`}>
+                        className={`${currentPage === i + 1 ? 'bg-[#434343] text-amber-50 px-3 py-2 rounded-lg font-semibold border-2 border-[#434343] cursor-pointer active:opacity-65 hover:opacity-90 shadow-gray-700 shadow-[0_10px_20px_-5px_rgba(0,0,0,0.3)]' : 'px-3 py-2 rounded-lg font-semibold border-2 border-[#434343] cursor-pointer active:opacity-65 hover:opacity-90 shadow-gray-700 shadow-[0_10px_20px_-5px_rgba(0,0,0,0.3)]'}`}>
                             {i + 1}
                         </button>
                         ) 
@@ -372,7 +372,7 @@ const DisplayCars = ({refreshTrigger}) => {
                 <button
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1 ))}
-                className='flex justify-center items-center gap-2 cursor-pointer border-2 disabled:cursor-not-allowed active:opacity-65 border-[#434343] rounded-lg px-3 py-2 shadow-xl'>
+                className='flex justify-center items-center gap-2 cursor-pointer border-2 disabled:cursor-not-allowed active:opacity-65 border-[#434343] rounded-lg px-3 py-2 shadow-gray-700 shadow-[0_10px_20px_-5px_rgba(0,0,0,0.3)]'>
                     Next
                     <FaGreaterThan />
                 </button>

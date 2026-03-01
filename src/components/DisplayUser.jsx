@@ -168,7 +168,7 @@ const DisplayUser = ({ refreshUsers }) => {
               setSelectedUserId(u._id);
               setIsClick(true);
             }}
-            className='grid grid-cols-5 hover:bg-[#434343] overflow-hidden cursor-pointer transition hover:-translate-y-1 hover:rounded-full hover:text-amber-50 duration-500 shadow-lg justify-center items-center rounded-full px-1 bg-[#a4a4a4]'>
+            className='grid grid-cols-5 hover:bg-[#434343] overflow-hidden shadow-gray-700 shadow-[0_10px_20px_-5px_rgba(0,0,0,0.3)] cursor-pointer transition hover:-translate-y-1 hover:rounded-full hover:text-amber-50 duration-500 justify-center items-center rounded-full px-1 bg-[#a4a4a4]'>
               <div className='col-span-1'>
                 <img
                 src={u.profileImageUrl}
