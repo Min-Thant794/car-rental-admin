@@ -232,7 +232,7 @@ const TopNavBar = () => {
                     onClick={(e) => {
                         e.stopPropagation();
                     }}
-                    className='bg-[#434343] p-5 w-2/5 z-50 rounded-lg'>
+                    className='bg-[#434343] p-5 w-4/9 z-50 rounded-lg'>
                         <div className='flex justify-between items-center font-bold tracking-wide text-xl text-amber-50'>
                             <div>
                                 Profile Details
@@ -252,9 +252,9 @@ const TopNavBar = () => {
                             e.preventDefault();
                             handleUserUpdate();
                         }}
-                        className='grid grid-cols-7 pt-5 text-amber-50'>
-                            <div className='relative grid col-span-3'>
-                                <img src={previewImg || isUser?.profileImageUrl} alt="Profile Image" className='rounded-sm w-55 h-55 object-cover'/>
+                        className='flex gap-3 pt-5 text-amber-50'>
+                            <div className='relative flex w-2/5'>
+                                <img src={previewImg || isUser?.profileImageUrl} alt="Profile Image" className='rounded-sm w-full h-62 object-cover'/>
                                 {
                                     isEdit &&
                                     <div 
@@ -274,11 +274,11 @@ const TopNavBar = () => {
                                 className='hidden'
                                 onChange={(e) => uploadImage(e.target.files[0])} />
                             </div>
-                            <div className='col-span-4'>
-                                <div className='grid grid-cols-7'>
+                            <div className='flex flex-col w-3/5'>
+                                <div className='flex w-full'>
                                     <label 
                                     htmlFor='userName'
-                                    className='col-span-3 font-bold tracking-wide'>
+                                    className='font-bold tracking-wide w-2/7'>
                                         Username: 
                                     </label>
                                     <input 
@@ -287,12 +287,12 @@ const TopNavBar = () => {
                                     value={userName}
                                     readOnly={!isEdit}
                                     onChange={(e) => setUserName(e.target.value)}
-                                    className='col-span-4 font-semibold tracking-wide outline-none border-none' />
+                                    className='col-span-4 font-semibold tracking-wide w-5/7 outline-none border-none' />
                                 </div>
-                                <div className='grid grid-cols-7 pt-1'>
+                                <div className='flex pt-1 w-full'>
                                     <label 
                                     htmlFor='email'
-                                    className='col-span-3 font-bold tracking-wide'>
+                                    className='col-span-3 font-bold tracking-wide w-2/7'>
                                         Email Address: 
                                     </label>
                                     <input 
@@ -301,15 +301,15 @@ const TopNavBar = () => {
                                     value={email}
                                     readOnly={!isEdit}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className='col-span-4 font-semibold tracking-wide outline-none border-none' />
+                                    className='col-span-4 font-semibold tracking-wide w-5/7 outline-none border-none' />
                                 </div>
-                                <div className='grid grid-cols-7 pt-1'>
+                                <div className='flex pt-1 w-full'>
                                     <label 
                                     htmlFor='password'
-                                    className='col-span-3 font-bold tracking-wide'>
+                                    className='font-bold tracking-wide w-2/7'>
                                         Password:
                                     </label>
-                                    <div className='flex justify-between items-center col-span-4'>
+                                    <div className='flex justify-between w-5/7 items-center col-span-4'>
                                         <input 
                                         type={showPassword ? "text" : "password"}
                                         id='password' 
@@ -335,27 +335,27 @@ const TopNavBar = () => {
                                         }
                                     </div>
                                 </div>
-                                <div className='grid grid-cols-7 pt-1'>
-                                    <div className='col-span-3 font-bold tracking-wide'>
+                                <div className='flex pt-1 w-full'>
+                                    <div className='font-bold tracking-wide w-2/7'>
                                         Account Status: 
                                     </div>
-                                    <div className='col-span-4 font-semibold tracking-wide'>
+                                    <div className='font-semibold tracking-wide w-5/7'>
                                         {isUser.accountStatus}
                                     </div>
                                 </div>
-                                <div className='grid grid-cols-7 pt-1'>
-                                    <div className='col-span-3 font-bold tracking-wide'>
+                                <div className='flex pt-1 w-full'>
+                                    <div className='font-bold tracking-wide w-2/7'>
                                         Created At: 
                                     </div>
-                                    <div className='col-span-4 font-semibold tracking-wide'>
+                                    <div className='font-semibold tracking-wide w-5/7'>
                                         {isUser.createdAt.slice(0, 10)}
                                     </div>
                                 </div>
-                                <div className='grid grid-cols-7 pt-1'>
-                                    <div className='col-span-3 font-bold tracking-wide'>
+                                <div className='flex pt-1 w-full'>
+                                    <div className='font-bold tracking-wide w-2/7'>
                                         Updated At: 
                                     </div>
-                                    <div className='col-span-4 font-semibold tracking-wide'>
+                                    <div className='font-semibold tracking-wide w-5/7'>
                                         {isUser.updatedAt.slice(0, 10)}
                                     </div>
                                 </div>

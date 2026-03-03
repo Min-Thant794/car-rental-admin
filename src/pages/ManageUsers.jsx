@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import DisplayUser from '../components/DisplayUser'
+import DisplayUser from '../modals/DisplayUser'
 import CreateUser from '../components/CreateUser'
 
 const ManageUsers = () => {

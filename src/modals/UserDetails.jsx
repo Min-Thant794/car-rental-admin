@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import { toast } from 'react-toastify';
-import UserInputField from './UserInputField'
+import UserInputField from '../components/UserInputField'
 import { IoClose } from 'react-icons/io5';
 import defaultImage from '../assets/default image.png';
-import DeleteConfirm from './DeleteConfirm';
-import UserDetailsLoadingSkeleton from './UserDetailsLoadingSkeleton'
+import DeleteConfirm from '../components/DeleteConfirm';
+import UserDetailsLoadingSkeleton from '../components/UserDetailsLoadingSkeleton'
 
 const UserDetails = ({userId, user, setIsClick, fetchUser, onDelete, onUpdate}) => {
 
-  const [ userData, setUserData ] = useState([]);
+  const [ userData, setUserData ] = useState({});
   const [ isLoading, setIsLoading ] = useState(false);
   const [ isShowPassword, setIsShowPassword ] = useState(false);
   const [ previewProfileImageById, setPreviewProfileImageById] = useState(null);
@@ -70,7 +70,7 @@ const UserDetails = ({userId, user, setIsClick, fetchUser, onDelete, onUpdate}) 
       setProfileImageFile(null);
       setLicenseImageFile(null);
     }
-  }, [user?._id]);
+  }, [user]);
 
   const uploadProfileImg = (file) => {
     if(!file) return;
@@ -92,12 +92,13 @@ const UserDetails = ({userId, user, setIsClick, fetchUser, onDelete, onUpdate}) 
   const handleUpdateUser = async (id) => {
     try {
       setIsLoading(true);
-      if(!id) {
+
+      if (!id) {
         toast.error("Unable to update user. User ID not found.");
         return;
       }
 
-      if(userData?.userName === "Admin One") {
+      if (userData?.userName === "Admin One") {
         toast.error("This user cannot be edited");
         return;
       }
@@ -106,18 +107,18 @@ const UserDetails = ({userId, user, setIsClick, fetchUser, onDelete, onUpdate}) 
       formData.append("userName", userData?.userName || "");
       formData.append("email", userData?.email || "");
 
-      if(userData?.password?.trim()) {
+      if (userData?.password?.trim()) {
         formData.append("password", userData?.password.trim());
       }
 
       formData.append("role", userData?.role);
 
-      if(profileImageFile) {
+      if (profileImageFile) {
         formData.append("profileImageUrl", profileImageFile);
       }
 
       formData.append("accountStatus", userData?.accountStatus);
-      
+
       if (userData?.role === "Customer") {
         const phoneNumber = userData?.phoneNumber ?? initialUserData?.phoneNumber;
         const dob = userData?.dateOfBirth ?? initialUserData?.dateOfBirth;
@@ -131,32 +132,53 @@ const UserDetails = ({userId, user, setIsClick, fetchUser, onDelete, onUpdate}) 
       }
 
       const updatedUser = await onUpdate(id, formData);
-      await fetchUser();
+      if (!updatedUser) return;
 
-      if(!updatedUser) {
-        return;
-      }
+      const c =
+        updatedUser?.customerProfile ||
+        updatedUser?.customer ||
+        updatedUser?.customerId ||
+        null;
 
       setUserData((prev) => ({
         ...prev,
         ...updatedUser,
-        licenseImageUrl: c?.licenseImageUrl ?? updatedUser?.licenseImageUrl ?? prev?.licenseImageUrl ?? "",
-        verificationStatus: c?.verificationStatus ?? updatedUser?.verificationStatus ?? prev?.verificationStatus ?? "pending",
+        licenseImageUrl:
+          c?.licenseImageUrl ??
+          updatedUser?.licenseImageUrl ??
+          prev?.licenseImageUrl ??
+          "",
+        verificationStatus:
+          c?.verificationStatus ??
+          updatedUser?.verificationStatus ??
+          prev?.verificationStatus ??
+          "pending",
       }));
 
       setInitialUserData((prev) => ({
         ...prev,
         ...updatedUser,
-        licenseImageUrl: c?.licenseImageUrl ?? updatedUser?.licenseImageUrl ?? prev?.licenseImageUrl ?? "",
-        verificationStatus: c?.verificationStatus ?? updatedUser?.verificationStatus ?? prev?.verificationStatus ?? "pending",
+        licenseImageUrl:
+          c?.licenseImageUrl ??
+          updatedUser?.licenseImageUrl ??
+          prev?.licenseImageUrl ??
+          "",
+        verificationStatus:
+          c?.verificationStatus ??
+          updatedUser?.verificationStatus ??
+          prev?.verificationStatus ??
+          "pending",
       }));
 
-      setPreviewProfileImageById(updatedUser?.profileImageUrl || previewProfileImageById || null);
-      
-      const c = updatedUser?.customerProfile;
+      setPreviewProfileImageById(
+        updatedUser?.profileImageUrl || previewProfileImageById || null
+      );
 
       setPreviewLicenseImageById(
-        c?.licenseImageUrl ?? updatedUser?.licenseImageUrl ?? previewLicenseImageById ?? null
+        c?.licenseImageUrl ??
+          updatedUser?.licenseImageUrl ??
+          previewLicenseImageById ??
+          null
       );
 
       setProfileImageFile(null);
@@ -168,7 +190,7 @@ const UserDetails = ({userId, user, setIsClick, fetchUser, onDelete, onUpdate}) 
     } finally {
       setIsLoading(false);
     }
-  }
+  };
 
   const handleDeleteUser = async (id) => {
     try {
@@ -217,7 +239,7 @@ const UserDetails = ({userId, user, setIsClick, fetchUser, onDelete, onUpdate}) 
       e.stopPropagation();
       setIsDelete(false);
     }}
-    className='bg-[#a4a4a4] shadow-lg rounded-lg mt-10 py-2 px-5 w-5/10 h-8/10'>
+    className='bg-[#a4a4a4] shadow-lg rounded-lg mt-10 py-2 px-5 w-6/10 h-8/10'>
       <div className='flex justify-between items-center'>
         <div className='font-bold text-2xl'>
           {isEdit ? "Edit User" : "User Details"}
@@ -324,7 +346,7 @@ const UserDetails = ({userId, user, setIsClick, fetchUser, onDelete, onUpdate}) 
                 e.stopPropagation();
                 clearForm();
               }}
-              className='absolute right-25 border-2 border-[#434343]  mt-5 rounded-lg px-3 py-2 w-2/15 font-semibold tracking-wide text-center active:opacity-65 hover:opacity-80 cursor-pointer'>
+              className='absolute right-27 border-2 border-[#434343]  mt-5 rounded-lg px-3 py-1.5 w-2/15 font-semibold tracking-wide text-center active:opacity-65 hover:opacity-80 cursor-pointer'>
                 Cancel
               </div>
             }
