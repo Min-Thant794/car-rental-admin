@@ -22,7 +22,7 @@ const DisplayUser = ({ refreshUsers }) => {
       if(response.success) {
         const fetchedData = response?.data || [];
         const normalizeUser = (u) => {
-        const c = u?.customer || u?.customerId || u?.customerProfile || null; // adjust if your backend uses a different key
+        const c = u?.customer || u?.customerId || u?.customerProfile || null;
 
         return {
           ...u,
@@ -46,7 +46,7 @@ const DisplayUser = ({ refreshUsers }) => {
     } finally {
       setIsLoading(false);
     }
-  }, [refreshUsers])
+  }, [refreshUsers]);
 
   const handleUpdateUser = async (id, payload) => {
     const previousUser = allUsers;
