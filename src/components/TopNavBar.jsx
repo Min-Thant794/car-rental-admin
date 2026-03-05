@@ -23,6 +23,14 @@ const TopNavBar = () => {
   const [file, setFile] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
 
+  useEffect(() => {
+    if(expandUserDetail) {
+        document.body.style.overflow = "hidden";
+    } else {
+        document.body.style.overflow = "auto";
+    }
+  }, [expandUserDetail]);
+
   const uploadImage = (file) => {
     if(!file) return 
     setFile(file);
@@ -188,7 +196,7 @@ const TopNavBar = () => {
             onClick={(e) => {
                 e.stopPropagation();
             }}
-            className={`transition-all shadow-md duration-300 ${userDetail ? "opacity-100 translate-y-1" : "opacity-0 -translate-y-1 pointer-events-none"} flex flex-col px-3 py-3 bg-[#a4a4a4] absolute right-5 top-17 w-40 rounded-lg cursor-pointer`}>
+            className={`transition-all shadow-md duration-300 ${userDetail ? "opacity-100 translate-y-1" : "opacity-0 -translate-y-1 pointer-events-none"} flex flex-col px-3 py-3 bg-[#a4a4a4] absolute right-5 top-17 w-45 rounded-lg cursor-pointer`}>
                 <div 
                 onClick={(e) => {
                     e.stopPropagation();

@@ -167,15 +167,15 @@ const CreateUser = ({setAddUser, triggerRefreshUsers }) => {
   return (
     <div 
     onClick={(e) => {e.stopPropagation()}}
-    className='bg-[#a4a4a4] shadow-lg rounded-lg mt-10 pt-2 px-5 w-5/10 h-8/10'>
-        <div className='flex text-2xl px-5 font-bold items-center tracking-wide justify-between'>
+    className='bg-[#a4a4a4] shadow-lg rounded-lg mt-10 pt-2 px-5 w-5/10 h-8/11'>
+        <div className='flex text-2xl pl-5 font-bold items-center tracking-wide justify-between'>
           <div>Create User</div>
-          <div 
-          onClick={() => {
-            resetForm();  
-            setAddUser(false)
-          }}
-          className='cursor-pointer active:opacity-65 hover:opacity-80'><IoClose onClick={() => {setAddUser(false)}}/></div>
+            <IoClose onClick={() => {
+              resetForm();  
+              setAddUser(false)
+            }}
+            className='cursor-pointer text-3xl active:opacity-65 hoevr:opacity-90'
+            />
         </div>
         <form
         onSubmit={async (e) => {

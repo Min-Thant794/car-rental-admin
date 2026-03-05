@@ -239,7 +239,7 @@ const UserDetails = ({userId, user, setIsClick, fetchUser, onDelete, onUpdate}) 
       e.stopPropagation();
       setIsDelete(false);
     }}
-    className='bg-[#a4a4a4] shadow-lg rounded-lg mt-10 py-2 px-5 w-6/10 h-8/10'>
+    className='bg-[#a4a4a4] shadow-lg rounded-lg mt-10 py-2 px-5 w-1/2 h-8/11'>
       <div className='flex justify-between items-center'>
         <div className='font-bold text-2xl'>
           {isEdit ? "Edit User" : "User Details"}
@@ -249,7 +249,7 @@ const UserDetails = ({userId, user, setIsClick, fetchUser, onDelete, onUpdate}) 
           setIsEdit(false);
           setIsClick(false);
         }}
-        className='text-2xl cursor-pointer hover:opacity-80 active:opacity-65 font-bold'/>
+        className='text-3xl cursor-pointer hover:opacity-80 active:opacity-65 font-bold'/>
       </div>
       <form 
       onSubmit={(e) => {

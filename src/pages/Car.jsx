@@ -4,12 +4,21 @@ import { FaEdit } from 'react-icons/fa';
 import { createCar } from '../services/car.service';
 import DisplayCars from '../components/DisplayCars';
 import { toast } from 'react-toastify';
+import { IoClose } from 'react-icons/io5';
 
 const Car = () => {
 
   const [addCar, setAddCar] = useState(false);
   const [carListVersion, setCarListVersion] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if(addCar) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+  }, [addCar]);
   
   const initialForm = useMemo(() => ({
     carName: "",
@@ -166,7 +175,10 @@ const Car = () => {
           onClick={(e) => {
             e.stopPropagation();
           }}
-          className='w-6/10 flex bg-[#434343] shadow-xl rounded-lg px-5 py-2'>
+          className='w-6/10 relative pb-5 pt-10 flex bg-[#434343] shadow-xl rounded-lg px-5'>
+            <IoClose 
+            onClick={() => setAddCar(false)}
+            className='absolute top-3 right-3 text-3xl text-amber-50 cursor-pointer active:opacity-65 hover:opacity-90'/>
             <div className='relative flex items-center w-1/2 h-full mt-5'>
               {/* preview image */}
               <div className='w-full h-full'>

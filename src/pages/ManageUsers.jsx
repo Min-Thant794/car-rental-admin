@@ -1,11 +1,10 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import DisplayUser from '../modals/DisplayUser'
 import CreateUser from '../components/CreateUser'
 
 const ManageUsers = () => {
 
-  const[addUser, setAddUser] = useState(false);
-  
+  const[addUser, setAddUser] = useState(false);  
   const [refreshUsers, setRefreshUsers] = useState(0);
 
   const triggerRefreshUsers = () => setRefreshUsers((prev) => prev + 1);
@@ -13,6 +12,14 @@ const ManageUsers = () => {
   const toggleAddUser = () => {
     setAddUser(true);
   }
+
+  useEffect(() => {
+    if(addUser) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+  }, [addUser]);
 
   return (
     <div className='relative'>
