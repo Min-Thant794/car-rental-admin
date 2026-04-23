@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🛠️ IRBS Car Rental
+# 🚗 IRBS Car Rental
 
 ### Admin Dashboard
 
