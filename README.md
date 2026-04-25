@@ -116,7 +116,7 @@ cp .env.example .env
 ```
 
 ```env
-VITE_API_BASE_URL=http://localhost:5000/api
+VITE_API_BASE_URL=http://localhost:8100/api/v1
 ```
 
 > Make sure this URL matches the port your backend is running on.
@@ -137,7 +137,7 @@ Open [http://localhost:5174](http://localhost:5174) in your browser.
 
 | Variable | Description | Example |
 |---|---|---|
-| `VITE_API_BASE_URL` | Base URL of the backend REST API | `http://localhost:5000/api` |
+| `VITE_API_BASE_URL` | Base URL of the backend REST API | `http://localhost:8100/api/v1` |
 
 ---
 

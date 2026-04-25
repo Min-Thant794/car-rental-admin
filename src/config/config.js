@@ -1,7 +1,8 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8100/api/v1";
-const SERVER_URL = import.meta.env.VITE_SERVER_URL || "https://car-rental-backend-h2sh.onrender.com";
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "https://car-rental-backend-h2sh.onrender.com/api/v1").replace(/\/$/, "");
+const SERVER_URL = API_BASE_URL;
 
 export const API_ROUTES = {
+    API_BASE_URL,
     LOCAL_BASE_URL: API_BASE_URL,
     SERVER_URL,
 
