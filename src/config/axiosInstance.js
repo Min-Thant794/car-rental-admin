@@ -2,9 +2,9 @@ import axios from "axios";
 import {API_ROUTES} from './config';
 
 const axiosInstance = axios.create({
-    baseURL: API_ROUTES.LOCAL_BASE_URL,
+    baseURL: API_ROUTES.SERVER_URL,
     withCredentials: true,
-    timeout: 10000
+    //timeout: 10000
 });
 
 axiosInstance.interceptors.response.use(

@@ -1,9 +1,9 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8100/api/v1";
-const SERVER_URL = import.meta.env.VITE_SERVER_URL || "http://localhost:8100/";
+const SERVER_URL = import.meta.env.VITE_SERVER_URL || "https://car-rental-backend-h2sh.onrender.com";
 
 export const API_ROUTES = {
     LOCAL_BASE_URL: API_BASE_URL,
-    LOCAL_SERVER_URL: SERVER_URL,
+    SERVER_URL,
 
     //user auth
     ADMIN_LOGIN: "/user/auth/admin/login",
