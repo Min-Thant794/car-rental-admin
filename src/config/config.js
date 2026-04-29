@@ -9,6 +9,7 @@ export const API_ROUTES = {
     //user auth
     ADMIN_LOGIN: "/user/auth/admin/login",
     GET_CURRENT_ADMIN: "/user/auth/admin/me",
+    LOGOUT_USER: "/user/auth/logout",
     GET_ALL_USER: "/user",
     UPDATE_USER: "/user",
     POST_NEW_USER: "/user/user-create-by-admin",

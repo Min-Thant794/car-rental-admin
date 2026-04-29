@@ -1,5 +1,5 @@
 import React from 'react'
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import {routes} from '../config/Routes'
 import { useUser } from '../context/UserContext';
 import Logo from '../assets/logo.png'
@@ -7,6 +7,7 @@ import Logo from '../assets/logo.png'
 const NavBar = () => {
 
   const {logout} = useUser();
+  const navigate = useNavigate();
   const navRoutes = routes.find((route) => route.children);
 
   return (
@@ -40,6 +41,7 @@ const NavBar = () => {
       onClick={(e) => {
         e.preventDefault();
         logout();
+        navigate("/login", { replace: true });
       }}
       className='transition duration-300 btn-border-reveal shadow-gray-700 shadow-[0_10px_20px_-5px_rgba(0,0,0,0.3)] font-bold tracking-wide px-3 py-2 bg-[#393939] text-amber-50 rounded-lg my-5 mx-4 active:opacity-65 hover:opacity-85 cursor-pointer'>
         Log out

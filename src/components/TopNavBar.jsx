@@ -214,11 +214,11 @@ const TopNavBar = () => {
                 </div>
 
                 <div 
-                onClick={async (e) => {
+                onClick={(e) => {
                     e.stopPropagation();
                     setUserDetail(false);
-                    await logout();
-                    navigate("/login");
+                    logout();
+                    navigate("/login", { replace: true });
                 }}
                 className='flex items-center gap-2 font-semibold tracking-wide pt-2 hover:opacity-75 active:opacity-65'>
                     <div className='text-xl'>
